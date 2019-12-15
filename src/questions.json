@@ -12,8 +12,7 @@
        {
         "name": "Firstname",
         "title": "First name",
-        "cellType": "text",
-        "isRequired": true
+        "cellType": "text"
        },
        {
         "name": "Surname",
@@ -25,6 +24,11 @@
         "name": "Gender",
         "title": "Gender",
         "cellType": "dropdown"
+       },
+       {
+        "name": "DOB",
+        "title": "Date of birth",
+        "cellType": "date"
        }
       ],
       "choices": [
@@ -143,14 +147,37 @@
      {
       "type": "matrixdropdown",
       "name": "pdcmthd",
+      "startWithNewLine": false,
       "title": "Principal Substance of Concern and Method of Use",
       "columns": [
        {
-        "name": "pdc",
-        "title": "PDC"
+        "name": "PDC",
+        "title": "PDC",
+        "choices": [
+         {
+          "value": "alcohol",
+          "text": "Alcohol"
+         },
+         {
+          "value": "nicotine",
+          "text": "Nictotine"
+         },
+         {
+          "value": "amphetamine",
+          "text": "Amphetamine"
+         },
+         {
+          "value": "cocaine",
+          "text": "Cocaine"
+         },
+         {
+          "value": "opioids",
+          "text": "Opioids"
+         }
+        ]
        },
        {
-        "name": "method",
+        "name": "pdcmthd",
         "title": "Method of Use",
         "choices": [
          {
@@ -164,7 +191,7 @@
         ]
        },
        {
-        "name": "pdc_ndays",
+        "name": "pdc_ndaysconsumed",
         "title": "How many days in the last 4 weeks",
         "cellType": "text",
         "requiredIf": "{pdcmthd.pdcdeets.pdc} empty",
@@ -215,15 +242,43 @@
       "columns": [
        {
         "name": "odc",
-        "title": "Other Drug Type"
+        "title": "Other Drug Type",
+        "choices": [
+         {
+          "value": "alcohol",
+          "text": "Alcohol"
+         },
+         {
+          "value": "nicotine",
+          "text": "Nicotine"
+         }
+        ]
        },
        {
         "name": "odc_mthd",
-        "title": "Method of Use"
+        "title": "Method of Use",
+        "choices": [
+         {
+          "value": "ingests",
+          "text": "Ingests"
+         },
+         {
+          "value": "injects",
+          "text": "Injects"
+         }
+        ]
        },
        {
         "name": "odc_ndays",
-        "title": "How many days in the last 4 weeks"
+        "title": "How many days in the last 4 weeks",
+        "cellType": "text",
+        "validators": [
+         {
+          "type": "numeric",
+          "minValue": 0,
+          "maxValue": 28
+         }
+        ]
        }
       ],
       "choices": [
@@ -256,7 +311,7 @@
       "title": "AOD History",
       "columns": [
        {
-        "name": "agefirstused",
+        "name": "age1stused",
         "title": "Age of First Use",
         "choices": [
          {
@@ -278,11 +333,79 @@
          {
           "value": "age13",
           "text": "13"
+         },
+         {
+          "value": "age14",
+          "text": "14"
+         },
+         {
+          "value": "age15",
+          "text": "15"
+         },
+         {
+          "value": "age16",
+          "text": "16"
+         },
+         {
+          "value": "age17",
+          "text": "17"
+         },
+         {
+          "value": "age18",
+          "text": "18"
+         },
+         {
+          "value": "age19",
+          "text": "19"
+         },
+         {
+          "value": "age20",
+          "text": "20"
+         },
+         {
+          "value": "age21",
+          "text": "21"
+         },
+         {
+          "value": "age22",
+          "text": "22"
+         },
+         {
+          "value": "age23",
+          "text": "23"
+         },
+         {
+          "value": "age24",
+          "text": "24"
+         },
+         {
+          "value": "age25",
+          "text": "25"
+         },
+         {
+          "value": "age26",
+          "text": "26"
+         },
+         {
+          "value": "age27",
+          "text": "27"
+         },
+         {
+          "value": "age28",
+          "text": "28"
+         },
+         {
+          "value": "age29",
+          "text": "29"
+         },
+         {
+          "value": "age30",
+          "text": "30"
          }
         ]
        },
        {
-        "name": "methd",
+        "name": "method",
         "title": "Method of Use",
         "choices": [
          {
@@ -300,7 +423,7 @@
         ]
        },
        {
-        "name": "Units",
+        "name": "units",
         "title": "Units",
         "choices": [
          {
@@ -314,7 +437,7 @@
         ]
        },
        {
-        "name": "frequency",
+        "name": "freq",
         "title": "How Often?",
         "choices": [
          {
@@ -340,15 +463,21 @@
         "title": "How much per day?",
         "cellType": "text",
         "width": "100",
+        "placeHolder": "10",
         "inputType": "range"
        }
       ],
       "choices": [
-       1,
-       2,
-       3,
-       4,
-       5
+       "5",
+       "10",
+       "20",
+       "30",
+       "40",
+       "50",
+       "60",
+       "70",
+       "80",
+       "90"
       ],
       "rowCount": 1
      }
@@ -385,8 +514,42 @@
       "otherText": "Other / Notes"
      },
      {
+      "type": "rating",
+      "name": "impctdaily",
+      "startWithNewLine": false,
+      "title": "# Impact on Daily Living",
+      "description": "# Impact on Daily Living \nDuring the last 4 weeks, how often has your substance use (or other addictive behaviour) impacted on your work or other daily living activities (like: social, recreational. study, caring for family)?",
+      "rateValues": [
+       {
+        "value": "0",
+        "text": "Not at all"
+       },
+       {
+        "value": "1",
+        "text": "Less than weekly"
+       },
+       {
+        "value": "2",
+        "text": "Once or twice a week"
+       },
+       {
+        "value": "3",
+        "text": "Three or four times a week"
+       },
+       {
+        "value": "4",
+        "text": "Daily or almost daily"
+       }
+      ],
+      "rateMin": 3,
+      "rateMax": 4,
+      "minRateDescription": "Not at all",
+      "maxRateDescription": "Daily or almost daily"
+     },
+     {
       "type": "matrixdropdown",
       "name": "addctv",
+      "startWithNewLine": false,
       "title": "Did you engage in any other addictive behaviours in the last 4 weeks?",
       "columns": [
        {
@@ -435,39 +598,6 @@
         "text": "Internet"
        }
       ]
-     },
-     {
-      "type": "rating",
-      "name": "impctdaily",
-      "startWithNewLine": false,
-      "title": "# Impact on Daily Living",
-      "description": "# Impact on Daily Living \nDuring the last 4 weeks, how often has your substance use (or other addictive behaviour) impacted on your work or other daily living activities (like: social, recreational. study, caring for family)?",
-      "rateValues": [
-       {
-        "value": "0",
-        "text": "Not at all"
-       },
-       {
-        "value": "1",
-        "text": "Less than weekly"
-       },
-       {
-        "value": "2",
-        "text": "Once or twice a week"
-       },
-       {
-        "value": "3",
-        "text": "Three or four times a week"
-       },
-       {
-        "value": "4",
-        "text": "Daily or almost daily"
-       }
-      ],
-      "rateMin": 3,
-      "rateMax": 4,
-      "minRateDescription": "Not at all",
-      "maxRateDescription": "Daily or almost daily"
      }
     ],
     "title": "Impact of Substance Use"

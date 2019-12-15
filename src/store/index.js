@@ -1,5 +1,6 @@
 import questions from './modules/questions/'
 import answers from './modules/answers/'
+import client from './modules/client/'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -9,5 +10,6 @@ export default new Vuex.Store({
     modules:{
       questions,
       answers,
+      client,
     }
 })
