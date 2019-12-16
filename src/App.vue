@@ -1,5 +1,14 @@
 <template>
   <div id="app">
+    <button id="show-modal" @click="showModal = true">Status/Overview</button>
+    <!-- use the modal component, pass in the prop -->
+    <SummaryModal v-if="showModal" @close="showModal = false">
+      <!--
+        you can use custom content here to overwrite
+        default content
+      -->
+      <h3 slot="header">Summary View</h3>
+    </SummaryModal>
 
     <survey :survey="survey"></survey>
 
@@ -13,6 +22,7 @@ import * as SurveyVue from "survey-vue";
 //import * as widgets from "surveyjs-widgets";
 import { mapActions } from 'vuex'
 import * as  surveyQuestions from  './questions';
+import SummaryModal from './SummaryModal';
 
 var Survey = SurveyVue.Survey;
  //Survey.cssType = "modern";
@@ -20,27 +30,11 @@ SurveyVue
     .StylesManager
     .applyTheme("modern");
 
-
-//import * as widgets from "surveyjs-widgets";
-//import "inputmask/dist/inputmask/phone-codes/phone.js";
-//import RadioGroup from './components/RadioGroup';
-//import { init as customWidget } from "./customwidget";
-
-
-// widgets.icheck(SurveyVue); widgets.select2(SurveyVue); widgets.inputmask(SurveyVue);widgets.jquerybarrating(SurveyVue);
-//widgets.jqueryuidatepicker(SurveyVue);
-//widgets.nouislider(SurveyVue);widgets.select2tagbox(SurveyVue);
-// widgets.signaturepad(SurveyVue); widgets.sortablejs(SurveyVue); widgets.ckeditor(SurveyVue);
-// widgets.autocomplete(SurveyVue);
-
-//customWidget(SurveyVue);
-
 export default {
   name: "app",
   components: {
     Survey,
-   // RadioGroup,
-    //
+    SummaryModal,
   },
   methods: {
       // ...mapActions([
@@ -54,29 +48,29 @@ export default {
         console.log(result)
         return true;
       },
-    
+
       sendDataToTheServer: function (isComplete, data) {
          var text = isComplete ? "The survey is completed" : "The survey is not completed";
          // {"Quality":{"affordable":"1","does what it claims":"2","better then others":"3","easy to use":"4"},"satisfaction":"4","recommend friends":"3","suggestions":"sfasdf","pricelimit":{"mostamount":"asdfa","leastamount":"asdf"},"email":"ff"}
          // text + ", result: " +
          //var result =  JSON.stringify(data);
-         
+
             console.log("going to send data to server", data)
             this.GET_CLIENT(data).then((dataRes) => {
                 console.log("added message", dataRes)
                // this.$emit('addedMessage')
-               // _this.dialog = false 
+               // _this.dialog = false
             })
-      // AJAX here 
+      // AJAX here
       }
- 
+
   },
   mounted(){
 
 
   },
   data() {
-      
+    //showModal: false;
     let json = surveyQuestions.default ; //{  };
 
     json['sendResultOnPageNext'] = true;
@@ -99,6 +93,7 @@ export default {
     });
 
     return {
+      showModal: false,
       survey: model
     };
    }
@@ -122,12 +117,27 @@ export default {
         //me.sendDataToTheServer(true, survey.data);
     //model.onServerValidateQuestions
     // https://github.com/surveyjs/survey-library/issues/780 https://next.plnkr.co/edit/yU0BJA?p=preview&preview
-    
+
     // function sendDataToTheServer(isComplete, data) {
     //   var text = isComplete ? "The survey is completed" : "The survey is not completed";
     //   document.querySelector('#surveyResult').innerHTML = text + ", result: " + JSON.stringify(data);
-    //   // AJAX here 
+    //   // AJAX here
     // }
 
- 
+
+
+//import * as widgets from "surveyjs-widgets";
+//import "inputmask/dist/inputmask/phone-codes/phone.js";
+//import RadioGroup from './components/RadioGroup';
+//import { init as customWidget } from "./customwidget";
+
+
+// widgets.icheck(SurveyVue); widgets.select2(SurveyVue); widgets.inputmask(SurveyVue);widgets.jquerybarrating(SurveyVue);
+//widgets.jqueryuidatepicker(SurveyVue);
+//widgets.nouislider(SurveyVue);widgets.select2tagbox(SurveyVue);
+// widgets.signaturepad(SurveyVue); widgets.sortablejs(SurveyVue); widgets.ckeditor(SurveyVue);
+// widgets.autocomplete(SurveyVue);
+
+//customWidget(SurveyVue);
+
     -->
