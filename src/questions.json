@@ -2,54 +2,8 @@
   "title": "ANSA Initial Assessment",
   "pages": [
    {
-    "name": "demographics",
+    "name": "survey_meta",
     "elements": [
-     {
-      "type": "matrixdropdown",
-      "name": "clientName",
-      "title": "Client name",
-      "columns": [
-       {
-        "name": "Firstname",
-        "title": "First name",
-        "cellType": "text"
-       },
-       {
-        "name": "Surname",
-        "title": "Surname",
-        "cellType": "text",
-        "isRequired": true
-       },
-       {
-        "name": "Gender",
-        "title": "Gender",
-        "cellType": "dropdown"
-       },
-       {
-        "name": "DOB",
-        "title": "Date of birth",
-        "cellType": "date"
-       }
-      ],
-      "choices": [
-       {
-        "value": "m",
-        "text": "Male"
-       },
-       {
-        "value": "f",
-        "text": "Female"
-       },
-       {
-        "value": "o",
-        "text": "Other"
-       }
-      ],
-      "cellType": "text",
-      "rows": [
-       "Identity"
-      ]
-     },
      {
       "type": "matrixdropdown",
       "name": "question2",
@@ -84,6 +38,7 @@
         "cellType": "dropdown"
        }
       ],
+      "columnLayout": "vertical",
       "choices": [
        {
         "value": 1,
@@ -139,14 +94,80 @@
       ]
      }
     ],
-    "title": "Demographics"
+    "title": "Survey Meta Information"
+   },
+   {
+    "name": "client_info",
+    "elements": [
+     {
+      "type": "matrixdropdown",
+      "name": "client_slk",
+      "title": "Client name",
+      "columns": [
+       {
+        "name": "Firstname",
+        "title": "First name",
+        "cellType": "text"
+       },
+       {
+        "name": "Surname",
+        "title": "Surname",
+        "cellType": "text"
+       },
+       {
+        "name": "Gender",
+        "title": "Gender",
+        "cellType": "dropdown"
+       }
+
+
+      ],
+      "columnLayout": "vertical",
+      "choices": [
+       {
+        "value": "m",
+        "text": "Male"
+       },
+       {
+        "value": "f",
+        "text": "Female"
+       },
+       {
+        "value": "o",
+        "text": "Other"
+       }
+      ],
+      "cellType": "text",
+      "rows": [
+       "."
+      ]
+     },
+          {
+            "type": "panel",
+            "name": "panel2",
+            "elements": [
+                {
+                    "type": "text",
+                    "inputType": "date",
+                    "isRequired": true,
+                    "name": "birthDate",
+                    "startWithNewLine": false,
+                    "title": "Date of birth:"
+                }
+            ],
+            "questionTitleLocation": "left"
+          
+        }
+
+    ],
+    "title": "Client Basic Information"
    },
    {
     "name": "substance_use",
     "elements": [
      {
       "type": "matrixdropdown",
-      "name": "pdcmthd",
+      "name": "pdc_and_usage",
       "startWithNewLine": false,
       "title": "Principal Substance of Concern and Method of Use",
       "columns": [
@@ -206,28 +227,7 @@
         "inputType": "number"
        }
       ],
-      "choices": [
-       {
-        "value": 1,
-        "text": "Alcohol"
-       },
-       {
-        "value": 2,
-        "text": "Nicotine"
-       },
-       {
-        "value": 3,
-        "text": "Methamphetamines"
-       },
-       {
-        "value": 4,
-        "text": "Cocaine"
-       },
-       {
-        "value": 5,
-        "text": "Opoids"
-       }
-      ],
+      "columnLayout": "vertical",
       "rows": [
        {
         "value": "pdcdeets",
@@ -236,250 +236,279 @@
       ]
      },
      {
-      "type": "matrixdynamic",
-      "name": "other_drugs",
-      "title": "Other Substances of concern",
-      "columns": [
+      "type": "paneldynamic",
+      "name": "odc",
+      "title": "Please enter all other drugs of concern",
+      "templateElements": [
        {
-        "name": "odc",
-        "title": "Other Drug Type",
+        "type": "dropdown",
+        "name": "Drug Type",
+        "isRequired": true,
         "choices": [
          {
           "value": "alcohol",
           "text": "Alcohol"
          },
          {
-          "value": "nicotine",
+          "value": "opioids",
+          "text": "Opioids"
+         },
+         {
+          "value": "sedatives",
+          "text": "Sedatives"
+         },
+         {
+          "value": "meth",
+          "text": "Meth"
+         },
+         {
+          "value": "nictonine",
           "text": "Nicotine"
          }
         ]
        },
        {
-        "name": "odc_mthd",
-        "title": "Method of Use",
-        "choices": [
+        "type": "panel",
+        "name": "moreInfo",
+        "elements": [
          {
-          "value": "ingests",
-          "text": "Ingests"
-         },
-         {
-          "value": "injects",
-          "text": "Injects"
-         }
-        ]
-       },
-       {
-        "name": "odc_ndays",
-        "title": "How many days in the last 4 weeks",
-        "cellType": "text",
-        "validators": [
-         {
-          "type": "numeric",
-          "minValue": 0,
-          "maxValue": 28
+          "type": "matrixdynamic",
+          "name": "method_of_use",
+          "columns": [
+           {
+            "name": "method",
+            "title": "Method of use",
+            "cellType": "dropdown",
+            "isRequired": true,
+            "choices": [
+             "Ingects",
+             "Smokes",
+             "Injects",
+             "Inhales"
+            ]
+           },
+           {
+            "name": "times_per_period",
+            "title": "In last 28 days",
+            "cellType": "dropdown"
+           }
+          ],
+          "columnLayout": "vertical",
+          "choices": [
+           {
+            "value": "item1",
+            "text": "5"
+           },
+           {
+            "value": "item2",
+            "text": "10"
+           },
+           {
+            "value": "item3",
+            "text": "15"
+           },
+           {
+            "value": "item4",
+            "text": "20"
+           },
+           {
+            "value": "item5",
+            "text": "25"
+           },
+           {
+            "value": "item6",
+            "text": "30"
+           }
+          ],
+          "rowCount": 1,
+          "minRowCount": 1,
+          "maxRowCount": 1
          }
         ]
        }
       ],
-      "choices": [
-       {
-        "value": 1,
-        "text": "Alcohol"
-       },
-       {
-        "value": 2,
-        "text": "two"
-       },
-       {
-        "value": 3,
-        "text": "three"
-       },
-       {
-        "value": 4,
-        "text": "four"
-       },
-       {
-        "value": 5,
-        "text": "five"
-       }
-      ],
-      "rowCount": 1
+      "maxPanelCount": 5,
+      "panelsState": "firstExpanded",
+      "panelAddText": "Add ODC",
+      "panelRemoveText": "Remove ODC",
+      "panelPrevText": "Prev",
+      "panelNextText": "Next",
+      "showRangeInProgress": false,
+      "renderMode": "progressTop"
      },
      {
-      "type": "matrixdynamic",
-      "name": "aod_history",
+      "type": "paneldynamic",
+      "name": "question1",
       "title": "AOD History",
-      "columns": [
+      "templateElements": [
        {
-        "name": "age1stused",
-        "title": "Age of First Use",
+        "type": "dropdown",
+        "name": "Drug Type",
+        "isRequired": true,
         "choices": [
          {
-          "value": "age9",
-          "text": "9"
+          "value": "alcohol",
+          "text": "Alcohol"
          },
          {
-          "value": "age10",
-          "text": "10"
+          "value": "opioids",
+          "text": "Opioids"
          },
          {
-          "value": "age11",
-          "text": "11"
+          "value": "sedatives",
+          "text": "Sedatives"
          },
          {
-          "value": "age12",
-          "text": "12"
+          "value": "meth",
+          "text": "Meth"
          },
          {
-          "value": "age13",
-          "text": "13"
-         },
-         {
-          "value": "age14",
-          "text": "14"
-         },
-         {
-          "value": "age15",
-          "text": "15"
-         },
-         {
-          "value": "age16",
-          "text": "16"
-         },
-         {
-          "value": "age17",
-          "text": "17"
-         },
-         {
-          "value": "age18",
-          "text": "18"
-         },
-         {
-          "value": "age19",
-          "text": "19"
-         },
-         {
-          "value": "age20",
-          "text": "20"
-         },
-         {
-          "value": "age21",
-          "text": "21"
-         },
-         {
-          "value": "age22",
-          "text": "22"
-         },
-         {
-          "value": "age23",
-          "text": "23"
-         },
-         {
-          "value": "age24",
-          "text": "24"
-         },
-         {
-          "value": "age25",
-          "text": "25"
-         },
-         {
-          "value": "age26",
-          "text": "26"
-         },
-         {
-          "value": "age27",
-          "text": "27"
-         },
-         {
-          "value": "age28",
-          "text": "28"
-         },
-         {
-          "value": "age29",
-          "text": "29"
-         },
-         {
-          "value": "age30",
-          "text": "30"
+          "value": "nictonine",
+          "text": "Nicotine"
          }
         ]
        },
        {
-        "name": "method",
-        "title": "Method of Use",
-        "choices": [
+        "type": "panel",
+        "name": "moreInfo",
+        "elements": [
          {
-          "value": "ingest",
-          "text": "Ingest"
-         },
-         {
-          "value": "smoke",
-          "text": "Smoke"
-         },
-         {
-          "value": "inject",
-          "text": "Inject"
+          "type": "matrixdynamic",
+          "name": "method_of_use",
+          "columns": [
+           {
+            "name": "age",
+            "title": "Age of First Use"
+           },
+           {
+            "name": "method",
+            "title": "Method of use",
+            "cellType": "dropdown",
+            "choices": [
+             "Ingects",
+             "Smokes",
+             "Injects",
+             "Inhales"
+            ]
+           },
+           {
+            "name": "units",
+            "title": "Units",
+            "cellType": "dropdown",
+            "choices": [
+             {
+              "value": "peg",
+              "text": "Peg"
+             },
+             {
+              "value": "quart",
+              "text": "Quart"
+             },
+             {
+              "value": "shot",
+              "text": "Shot"
+             }
+            ]
+           },
+           {
+            "name": "hoften",
+            "title": "How Often",
+            "cellType": "dropdown",
+            "choices": [
+             {
+              "value": "daily",
+              "text": "Daily"
+             },
+             {
+              "value": "weekly",
+              "text": "Weekly"
+             }
+            ]
+           },
+           {
+            "name": "perday",
+            "title": "How much per day",
+            "cellType": "dropdown",
+            "choices": [
+             {
+              "value": "5",
+              "text": "< 5"
+             },
+             {
+              "value": "10",
+              "text": "5 - 10"
+             },
+             {
+              "value": "20",
+              "text": "11 - 20"
+             },
+             {
+              "value": "40",
+              "text": "21 - 40"
+             },
+             {
+              "value": "60",
+              "text": "41 - 60"
+             },
+             {
+              "value": "80",
+              "text": "61 - 80"
+             },
+             {
+              "value": "100",
+              "text": "81 - 100"
+             },
+             {
+              "value": "200",
+              "text": "100 - 200"
+             },
+             {
+              "value": "2000",
+              "text": "> 200"
+             }
+            ]
+           }
+          ],
+          "columnLayout": "vertical",
+          "choices": [
+           {
+            "value": "item1",
+            "text": "5"
+           },
+           {
+            "value": "item2",
+            "text": "10"
+           },
+           {
+            "value": "item3",
+            "text": "15"
+           },
+           {
+            "value": "item4",
+            "text": "20"
+           },
+           {
+            "value": "item5",
+            "text": "25"
+           },
+           {
+            "value": "item6",
+            "text": "30"
+           }
+          ],
+          "rowCount": 1,
+          "minRowCount": 1,
+          "maxRowCount": 1
          }
         ]
-       },
-       {
-        "name": "units",
-        "title": "Units",
-        "choices": [
-         {
-          "value": "std_drinks",
-          "text": "Standard drinks"
-         },
-         {
-          "value": "joints",
-          "text": "Joints"
-         }
-        ]
-       },
-       {
-        "name": "freq",
-        "title": "How Often?",
-        "choices": [
-         {
-          "value": "daily",
-          "text": "Daily"
-         },
-         {
-          "value": "weekly",
-          "text": "Weekly"
-         },
-         {
-          "value": "irregular",
-          "text": "Irregular Binges"
-         },
-         {
-          "value": "notusing",
-          "text": "Not Using Anymore"
-         }
-        ]
-       },
-       {
-        "name": "qtyperday",
-        "title": "How much per day?",
-        "cellType": "text",
-        "width": "100",
-        "placeHolder": "10",
-        "inputType": "range"
        }
       ],
-      "choices": [
-       "5",
-       "10",
-       "20",
-       "30",
-       "40",
-       "50",
-       "60",
-       "70",
-       "80",
-       "90"
-      ],
-      "rowCount": 1
+      "maxPanelCount": 5,
+      "panelsState": "firstExpanded",
+      "panelAddText": "Add Drug",
+      "panelRemoveText": "Remove Drug",
+      "showRangeInProgress": false,
+      "renderMode": "progressTop"
      }
     ],
     "title": "Substance Use"
@@ -518,7 +547,7 @@
       "name": "impctdaily",
       "startWithNewLine": false,
       "title": "# Impact on Daily Living",
-      "description": "# Impact on Daily Living \nDuring the last 4 weeks, how often has your substance use (or other addictive behaviour) impacted on your work or other daily living activities (like: social, recreational. study, caring for family)?",
+      "description": "During the last 4 weeks, how often has your substance use (or other addictive behaviour) impacted on your work or other daily living activities (like: social, recreational. study, caring for family)?",
       "rateValues": [
        {
         "value": "0",
@@ -603,5 +632,8 @@
     "title": "Impact of Substance Use"
    }
   ],
-  "showProgressBar": "top"
+  "showTitle": false,
+  "showProgressBar": "bottom",
+  "progressBarType": "questions",
+  "questionTitleTemplate": "{title}"
  }

@@ -9,19 +9,20 @@ import SurveyCreator from "./components/SurveyCreator";
 import * as SurveyVue from "survey-vue";
 import "bootstrap/dist/css/bootstrap.css";
 
-// var Survey = SurveyVue.Survey;
-// Survey.cssType = "bootstrap";
+var Survey = SurveyVue.Survey;
+Survey.cssType = "bootstrap";
 
 import * as widgets from "surveyjs-widgets";
 // import "inputmask/dist/inputmask/phone-codes/phone.js";
 import { init as customWidget } from "./customwidget";
+import * as  surveyQuestions from  './questions';
 
  widgets.jqueryuidatepicker(SurveyVue);
 
 export default {
   name: "app",
   components: {
-    //Survey,
+    Survey,
    // RadioGroup,
     SurveyCreator
   },
@@ -32,7 +33,8 @@ export default {
     .applyTheme("bootstrap");
   //   let me = this;
 
-  json = {};
+  //json = {};
+  let json = surveyQuestions.default ; //{  };
      var model = new SurveyVue.Model(json);
   //   //model.onServerValidateQuestions
   //   // https://github.com/surveyjs/survey-library/issues/780 https://next.plnkr.co/edit/yU0BJA?p=preview&preview

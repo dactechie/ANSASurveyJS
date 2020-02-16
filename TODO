@@ -1,0 +1,14 @@
+
+
+Q. How do we remove the need for Staff Login into the survey App, at the same time minimize the amount of typing required on the tablet device.
+    For repeat clients, staff may only need to edit small amounts(if any) of text(typed) information, as we are preloading it from previous assessments.
+    So the main typing (small, but multiple fields) is Firstname, Lastname, DOB (not really..picker)
+
+
+- when network connection is there download data of ALL clients (for their team) and store in indexDB
+- survey starts by identifying the clients - 
+   - CCARE/MCARE Client ID  
+   - DOB of client
+
+   This combination of values is only known to the staff. i.e. if the tablet is in possesion of anyone else,
+   they are unable to see other client's data (unless they do a bruteforce search.)

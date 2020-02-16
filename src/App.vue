@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-
+    <button id="show-modal" @click="showModal = true">Status/Overview</button>
+     <SummaryModal v-if="showModal" @close="showModal = false" @navTo="selectPage">
+  
+      <h3 slot="header">Summary View</h3>
+    </SummaryModal>
+    
     <survey :survey="survey"></survey>
 
   </div>
@@ -10,35 +15,21 @@
 
 
 import * as SurveyVue from "survey-vue";
-//import * as widgets from "surveyjs-widgets";
 import { mapActions } from 'vuex'
-import * as  surveyQuestions from  './questions';
+import surveyQuestions from  './questions.json';
+import SummaryModal from './SummaryModal';
+import drugs from './schema/drugs.json';
 
 var Survey = SurveyVue.Survey;
- //Survey.cssType = "modern";
 SurveyVue
     .StylesManager
     .applyTheme("modern");
-
-
-//import * as widgets from "surveyjs-widgets";
-//import "inputmask/dist/inputmask/phone-codes/phone.js";
-//import RadioGroup from './components/RadioGroup';
-//import { init as customWidget } from "./customwidget";
-
-
-// widgets.icheck(SurveyVue); widgets.select2(SurveyVue); widgets.inputmask(SurveyVue);widgets.jquerybarrating(SurveyVue);
-//widgets.jqueryuidatepicker(SurveyVue);
-//widgets.nouislider(SurveyVue);widgets.select2tagbox(SurveyVue);
-// widgets.signaturepad(SurveyVue); widgets.sortablejs(SurveyVue); widgets.ckeditor(SurveyVue);
-// widgets.autocomplete(SurveyVue);
-
-//customWidget(SurveyVue);
 
 export default {
   name: "app",
   components: {
     Survey,
+    SummaryModal,
    // RadioGroup,
     //
   },
@@ -49,46 +40,59 @@ export default {
       ...mapActions([
           'GET_CLIENT',
       ]),
+      // mounted(){
+      //     this.survey.pages[0].addNewQuestion("text", "newQuestion");
+      //      let toEdit = window.survey.pages[0].getQuestionByName("newQuestion");		
+      //     console.log("This question is going to be edited",toEdit)          
+      //     toEdit.name = "Edited Name"
+      //     toEdit.title = "Edited Title";                
+      //     window.survey.pages[0].addElement(toEdit, (toEdit.no-1));
+      // },
+
+       selectPage: function( page) {        
+        this.survey.currentPageNo = page;
+        var question = this.survey.getQuestionByName("pdc_and_usage");
+        question.columns[0].choices = drugs['enum'];
+        console.log(question);
+    },
       isClientExist: function(client_data) {
-        this.GET_CLIENT(client_data)
+        console("isclientExist" + client_data)
+        //this.GET_CLIENT(client_data)
         console.log(result)
         return true;
       },
-    
+      setPDC: function(prefill_data) {
+        let pdc = prefill_data['episodes'][0]['PDC']
+        console.log("PDC: " + pdc)
+        this.survey.setValue('pdcmthd', {'pdcdeets': {'PDC': pdc.toLowerCase()}})
+      },
       sendDataToTheServer: function (isComplete, data) {
          var text = isComplete ? "The survey is completed" : "The survey is not completed";
-         // {"Quality":{"affordable":"1","does what it claims":"2","better then others":"3","easy to use":"4"},"satisfaction":"4","recommend friends":"3","suggestions":"sfasdf","pricelimit":{"mostamount":"asdfa","leastamount":"asdf"},"email":"ff"}
-         // text + ", result: " +
-         //var result =  JSON.stringify(data);
          
             console.log("going to send data to server", data)
             this.GET_CLIENT(data).then((dataRes) => {
-                console.log("added message", dataRes)
+                if (!dataRes) return;
+                console.log("added message", dataRes);
+                this.setPDC(dataRes)
+                //pdcmthd.PDC choice = dataRes['episodes'][0]['PDC']
                // this.$emit('addedMessage')
                // _this.dialog = false 
             })
       // AJAX here 
-      }
- 
-  },
-  mounted(){
+      },
 
+},
 
-  },
   data() {
       
-    let json = surveyQuestions.default ; //{  };
-
+    let json = surveyQuestions;
     json['sendResultOnPageNext'] = true;
+    //json = setOfficialPDC(json);
     let me = this;
-
     var model = new SurveyVue.Model(json);
-
     model.onComplete.add(function(survey, options) {
         console.log(JSON.stringify(survey.data));
     });
-
-
     //     SurveyVue
     // .FunctionFactory
     // .Instance
@@ -98,7 +102,8 @@ export default {
         me.sendDataToTheServer(false, survey.data);
     });
 
-    return {
+    return {      
+      showModal: false,      
       survey: model
     };
    }
@@ -113,21 +118,4 @@ export default {
   color: #2c3e50;
 }
 </style>
-<!--
-  // "{"clientName":{"Identity":{"Firstname":"Aftab","Surname":"MJ","Gender":"m"}},"question2":{"r1":{"team":"tss","staff":"9"}},
-        // "pdcmthd":{"pdcdeets":{"pdc":1,"method":"ingests","pdc_ndays":20}},"other_drugs":[{"odc":2,"odc_mthd":3,"odc_ndays":4}],
-        // "aod_history":[{"agefirstused":"age11","methd":"ingest","Units":"std_drinks","frequency":"irregular","qtyperday":72},
-        // {"agefirstused":"age13","methd":"smoke","Units":"joints","frequency":"weekly","qtyperday":28}],
-        // "addctv":{"sex":{"ndays":0},"internet":{"ndays":26}},"aod_harms_risks":["morethanonedrug","other","memloss"],"aod_harms_risks-Comment":"Other notes","impctdaily":"1"}"
-        //me.sendDataToTheServer(true, survey.data);
-    //model.onServerValidateQuestions
-    // https://github.com/surveyjs/survey-library/issues/780 https://next.plnkr.co/edit/yU0BJA?p=preview&preview
-    
-    // function sendDataToTheServer(isComplete, data) {
-    //   var text = isComplete ? "The survey is completed" : "The survey is not completed";
-    //   document.querySelector('#surveyResult').innerHTML = text + ", result: " + JSON.stringify(data);
-    //   // AJAX here 
-    // }
 
- 
-    -->
