@@ -76,7 +76,7 @@ export default {
                 this.setPDC(dataRes)
                 //pdcmthd.PDC choice = dataRes['episodes'][0]['PDC']
                // this.$emit('addedMessage')
-               // _this.dialog = false 
+               // _this.dialog = false
             })
       // AJAX here 
       },
@@ -118,4 +118,3 @@ export default {
   color: #2c3e50;
 }
 </style>
-
