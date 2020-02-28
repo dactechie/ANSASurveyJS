@@ -1,3 +1,35 @@
+<template>
+  <transition name="modal-fade">
+    <div class="modal-backdrop">
+      <div class="modal" role="dialog" aria-labelledby="modalTitle"
+        aria-describedby="modalDescription">
+        <header class="modal-header" id="modalTitle">
+          <slot name="header">
+            Summary Panel
+            <button type="button" class="btn-close"
+              @click="close" aria-label="Close modal">
+              x
+            </button>
+          </slot>
+        </header>
+        <section class="modal-body" id="modalDescription">
+          <slot name="body">
+            <SummaryDashboard @navTo="navTo"/>
+          </slot>
+        </section>
+        <footer class="modal-footer">
+          <slot name="footer">
+            <button type="button" class="btn-green"
+              @click="close" aria-label="Close modal">
+              Close me!
+            </button>
+          </slot>
+        </footer>
+      </div>
+    </div>
+  </transition>
+</template>
+
 <script>
 import SummaryDashboard from './components/SummaryDashboard';
   export default {
@@ -27,57 +59,7 @@ import SummaryDashboard from './components/SummaryDashboard';
     },
   };
 </script>
-<template>
-  <transition name="modal-fade">
-    <div class="modal-backdrop">
-      <div class="modal"
-        role="dialog"
-        aria-labelledby="modalTitle"
-        aria-describedby="modalDescription"
-      >
-        <header
-          class="modal-header"
-          id="modalTitle"
-        >
-          <slot name="header">
-            This is the default tile!
 
-            <button
-              type="button"
-              class="btn-close"
-              @click="close"
-              aria-label="Close modal"
-            >
-              x
-            </button>
-          </slot>
-        </header>
-        <section
-          class="modal-body"
-          id="modalDescription"
-        >
-          <slot name="body">
-           
-            <SummaryDashboard @navTo="navTo"/>
-
-          </slot>
-        </section>
-        <footer class="modal-footer">
-          <slot name="footer">
-            <button
-              type="button"
-              class="btn-green"
-              @click="close"
-              aria-label="Close modal"
-            >
-              Close me!
-            </button>
-          </slot>
-        </footer>
-      </div>
-    </div>
-  </transition>
-</template>
 <style>
 
 .repository-lang-stats-graph {
@@ -94,12 +76,6 @@ import SummaryDashboard from './components/SummaryDashboard';
     border-bottom-right-radius: 3px;
     border-bottom-left-radius: 3px;
 }
-
-.d-flex {
-    display: flex!important;
-}
-
-
 
   .modal-backdrop {
     position: fixed;
