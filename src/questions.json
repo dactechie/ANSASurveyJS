@@ -1,12 +1,54 @@
 {
   "title": "ANSA Initial Assessment",
   "pages": [
+  {
+    "name": "client_lookup",
+    "elements": [
+      {
+      "type": "text",
+      "name": "client_id",
+      "title": "ID  - SLK / Database ID"
+      },
+      {
+      "type": "radiogroup",
+      "name": "id_type",
+      "title": "ID Type",
+      "validators": [
+        {
+         "type": "expression"
+        },
+        {
+         "type": "expression",
+         "text": "Did not find client"
+         
+        }
+      ],
+      "choices": [
+        {
+        "value": "SLK",
+        "text": "SLK"
+        },
+        {
+        "value": "MCARE_ID",
+        "text": "MCARE_ID"
+        },
+        {
+        "value": "CCARE_ID",
+        "text": "CCARE_ID"
+        }
+      ],
+      "colCount": 3
+      }
+    ],
+    "title": "Client Search"
+    },
+     
    {
     "name": "survey_meta",
     "elements": [
      {
       "type": "matrixdropdown",
-      "name": "question2",
+      "name": "team_staff",
       "title": "Your Directions / Pathways Details",
       "columns": [
        {
@@ -43,47 +85,47 @@
        {
         "value": 1,
         "text": "Glenda",
-        "visibleIf": "{question2.r1.team} = \"eurobodalla\""
+        "visibleIf": "{team_staff.r1.team} = \"eurobodalla\""
        },
        {
         "value": 2,
         "text": "Jacinta",
-        "visibleIf": "{question2.r1.team} = \"eurobodalla\""
+        "visibleIf": "{team_staff.r1.team} = \"eurobodalla\""
        },
        {
         "value": 3,
         "text": "Vic",
-        "visibleIf": "{question2.r1.team} = \"eurobodalla\""
+        "visibleIf": "{team_staff.r1.team} = \"eurobodalla\""
        },
        {
         "value": 4,
         "text": "Tracy",
-        "visibleIf": "{question2.r1.team} = \"eurobodalla\""
+        "visibleIf": "{team_staff.r1.team} = \"eurobodalla\""
        },
        {
         "value": 5,
         "text": "Aaron",
-        "visibleIf": "{question2.r1.team} = \"monaro\""
+        "visibleIf": "{team_staff.r1.team} = \"monaro\""
        },
        {
         "value": "6",
         "text": "Belinda",
-        "visibleIf": "{question2.r1.team} = \"monaro\""
+        "visibleIf": "{team_staff.r1.team} = \"monaro\""
        },
        {
         "value": "7",
         "text": "Michelle",
-        "visibleIf": "{question2.r1.team} = \"bega\""
+        "visibleIf": "{team_staff.r1.team} = \"bega\""
        },
        {
         "value": "9",
         "text": "Corrina",
-        "visibleIf": "{question2.r1.team} = \"tss\""
+        "visibleIf": "{team_staff.r1.team} = \"tss\""
        },
        {
         "value": "8",
         "text": "MJ",
-        "visibleIf": "{question2.r1.team} = \"tss\""
+        "visibleIf": "{team_staff.r1.team} = \"tss\""
        }
       ],
       "rows": [

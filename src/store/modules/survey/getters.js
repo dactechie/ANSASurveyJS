@@ -1,6 +1,9 @@
 
 const getters = {
-  fullSurvey: (state) => state.survey //.survey.data
+  fullSurvey: (state) => {
+    console.log("getter " ,state.survey);
+    return state.survey; //.survey.data
+  }
 }
 
 export default getters;

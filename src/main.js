@@ -1,20 +1,22 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import axios from 'axios'
-import VueAxios from 'vue-axios';
+// import axios from 'axios'
+// import VueAxios from 'vue-axios';
 import { VueHammer } from 'vue2-hammer'
 
 //import App from './AppCreator.vue' 
 //import router from './router'
 import App from './App.vue'
 import store from './store/index'
-import {API_URL} from './constants'
+//import _ from 'lodash';
+// import {API_URL} from './constants'
 
 Vue.config.productionTip = false;
-const baseAxios = axios.create({ baseURL: API_URL });
+//Object.defineProperty(Vue.prototype, '$_', { value: _ });
+// const baseAxios = axios.create({ baseURL: API_URL });
 
-Vue.use(VueAxios, baseAxios);
+// Vue.use(VueAxios, baseAxios);
 
 // WARNING .. this may not work .. what if the token is destroyed from local storage
 // Vue.axios.defaults.headers.common['Authorization'] =

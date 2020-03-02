@@ -12,6 +12,9 @@ export default new Vuex.Store({
       survey,
       //client
     },
+    // reducer: state => ({
+    //   survey: survey.survey,
+    // }),
     plugins: [
       createPersistedState({
         paths: ['survey'],

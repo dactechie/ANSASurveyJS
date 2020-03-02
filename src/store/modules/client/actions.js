@@ -3,11 +3,11 @@ import Vue from 'vue'
 export default {
 
     GET_CLIENT : async function getClient (state, client_details) {
-        let deets = client_details['clientName'];
-        if (!deets) return undefined;
-        
-        let client_identity = JSON.stringify(client_details['clientName']['Identity'])
-        console.log("client_details ", client_identity);
+      let deets = client_details['clientName'];
+      if (!deets) return undefined;
+      
+      let client_identity = JSON.stringify(client_details['clientName']['Identity'])
+      console.log("client_details ", client_identity);
 
       const url = 'http://localhost:7071/api/ANSAsurveyJSHttpTrigger';
       //'https://ansafuncs.azurewebsites.net/api/ANSAsurveyJSHttpTrigger'

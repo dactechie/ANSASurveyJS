@@ -1,4 +1,8 @@
 <template>
+<!--
+  ,
+         "expression": "lookupClient({client_id}, {id_type}) = true"
+  -->
   <div id="app" v-hammer:swipe.horizontal="onSwipeHorizontal">
     <button id="show-modal" @click="showModal = true">Status/Overview</button>
     
@@ -19,11 +23,53 @@ import SummaryModal from './SummaryModal';
 import drugs from './schema/drugs.json';
 import swipeEvent from './swipe.js';
 import setupAnimation from './transition.js';
+import  SurveyService from  './common/SurveyService';
+//assign call to onServerValidateQuestions callback
+/*  function lookupClient(survey, options) {
+    //options.data contains the data for the current page.
+    var client_id = options.data["client_id"];
+    //If the question is empty then do nothing
+    console.log("optiopns: ", options);
+    if (!client_id) 
+      options.complete();
+   let response =''
+      try {
+        // client_id_data = client_id_data +"";
+        // const comma_pos = client_id_data.search(",");
+        // const id = client_id_data.substring(0,comma_pos);
+        // const id_type = client_id_data.substring(comma_pos+1);
+        var id_type =  options.data["id_type"];
+        response =  SurveyService.getLastSurveyData(client_id, id_type).then(res =>{
+          console.log("resssssss", res);
+          if (res === undefined || res['data'] === "") {
+                console.log("adding an error xxxxxxxx");
+              options.errors["client_id"] = "The client id'" + client_id + "' is not found";
+            } else{
+              options['data'] = res['data']
+            }
+           options.complete();
+        });
+
+         console.log("getLastSurvey response", response.data);
+        } catch(err){
+          options.errors["client_id"] = "The cexcelpton..............";        
+          console.error(err)
+      }
+            //tell survey that we are done with the server validation
+      //options.complete();
+     
+}*/
 
 var Survey = SurveyVue.Survey;
 SurveyVue
     .StylesManager
     .applyTheme("modern");
+
+
+// SurveyVue
+//     .FunctionFactory
+//     .Instance
+//     .register("lookupClient", lookupClient, true);
 
 export default {
   name: "app",
@@ -35,31 +81,56 @@ export default {
   mounted() {
     this.survey.data = this.fullSurvey();
     setupAnimation(this.survey, this.doAnimation);
+
   },
 
   methods: {
       ...mapActions([
          // 'GET_CLIENT',
+         'GET_LAST_SURVEY',
           'UPDATE_SURVEY_DATA',
       ]),
-      ...mapGetters([
-        'fullSurvey']),
+      ...mapGetters(['fullSurvey']),
 
       onSwipeHorizontal: function(event) { swipeEvent(this.survey, event) ;},
     
-      // selectPage: function(page) {
-      //   console.log('--------');
-      //   this.survey.currentPageNo = page;
-      //   var question = this.survey.getQuestionByName("pdc_and_usage");
-      //   question.columns[0].choices = drugs['enum'];
-      //   console.log(question);
+      lookupClient:   async function (survey, options) {
+            //options.data contains the data for the current page.
+            var client_id = options.data["client_id"];
+            //If the question is empty then do nothing
+            console.log("optiopns: ", options);
+            if (!client_id) 
+              options.complete();
+          let response =''
+              try {
+                var id_type =  options.data["id_type"];
+                response = await this.GET_LAST_SURVEY(client_id+ ","+ id_type);
+                  let res = this.fullSurvey();
+                  console.log("resssssss", res);
+                  if (!res) {
+                     console.log("adding an error xxxxxxxx");
+                      options.errors["client_id"] = "The client id'" + client_id + "' is not found";
+                    } 
+                  options.complete();
+                } catch(err){
+                  options.errors["client_id"] = "The cexcelpton..............";        
+                  console.error(err)
+              }
+            
+        },
+      // lookupClient: async function(client_id_data) {
+    
+      //   await this.GET_LAST_SURVEY(client_id_data);
+
+      //   let ress = this.fullSurvey();
+      //   console.log("::::::::::", ress);
+      //   if (!ress){
+      //     console.log("returning FALSESSSSSSSSSSSSSE")
+      //     return false;
+      //   } 
+      //   console.log("returning True")
+      //   return true;
       // },
-      isClientExist: function(client_data) {
-        console.log("isclientExist" + client_data)
-        //this.GET_CLIENT(client_data)
-        console.log(result)
-        return true;
-      },
       setPDC: function(prefill_data) {
         let pdc = prefill_data['episodes'][0]['PDC']
         console.log("PDC: " + pdc)
@@ -87,14 +158,14 @@ export default {
     //json = setOfficialPDC(json);
     let me = this;
     var model = new SurveyVue.Model(json);
-    
+    model
+    .onServerValidateQuestions
+    .add(this.lookupClient);
     model.onComplete.add(function(survey, options) {
         console.log(JSON.stringify(survey.data));
     });
-    //     SurveyVue
-    // .FunctionFactory
-    // .Instance
-    // .register("isClientExist", me.isClientExist, true);
+   
+    
     // model.onCurrentPageChanging.add((model,options)=> {
     //   // update vuex state
     //   console.log(model);// VueSurveyModel {…}
