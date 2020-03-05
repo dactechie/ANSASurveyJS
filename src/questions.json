@@ -1,48 +1,125 @@
 {
   "title": "ANSA Initial Assessment",
+  "showNavigationButtons": false,
+  "goNextPageAutomatic": true,
   "pages": [
-  {
-    "name": "client_lookup",
-    "elements": [
-      {
-      "type": "text",
-      "name": "client_id",
-      "title": "ID  - SLK / Database ID"
-      },
-      {
-      "type": "radiogroup",
-      "name": "id_type",
-      "title": "ID Type",
-      "validators": [
-        {
-         "type": "expression"
-        },
-        {
-         "type": "expression",
-         "text": "Did not find client"
-         
-        }
+    {
+      "name": "LookupOptions",
+      "elements": [
+       {
+        "type": "radiogroup",
+        "name": "ClientLookupMethods",
+        "isRequired": true,
+        "title": "Lookup Client by : ",
+        "titleLocation": "left",
+        "commentText": "jhvjhv",
+        "choices": [
+         {
+          "value": "by_name",
+          "text": "Name, Sex, DOB"
+         },
+         {
+          "value": "by_id",
+          "text": "By DB-ID / SLK"
+         }
+        ],
+        "colCount": 2
+       }
+      ]
+     },
+     {
+      "name": "client_lookup_id",
+      "elements": [
+       {
+        "type": "panel",
+        "name": "ID_Lookup_Panel",
+        "elements": [
+         {
+          "type": "text",
+          "name": "client_id",
+          "title": "ID  - SLK / Database ID",
+          "isRequired": true
+         },
+         {
+          "type": "radiogroup",
+          "name": "id_type",
+          "title": "ID Type",
+          "isRequired": true,
+          "choices": [
+           {
+            "value": "SLK",
+            "text": "SLK"
+           },
+           {
+            "value": "MCARE_ID",
+            "text": "Mastercare"
+           },
+           {
+            "value": "CCARE_ID",
+            "text": "Communicare"
+           }
+          ],
+          "colCount": 3
+         }
+        ]
+       }
       ],
-      "choices": [
-        {
-        "value": "SLK",
-        "text": "SLK"
-        },
-        {
-        "value": "MCARE_ID",
-        "text": "MCARE_ID"
-        },
-        {
-        "value": "CCARE_ID",
-        "text": "CCARE_ID"
-        }
+      "visibleIf": "{ClientLookupMethods} = 'by_id'",
+      "title": "Client Lookup by ID"
+     },
+     {
+      "name": "client_lookup_name",
+      "elements": [
+       {
+        "type": "panel",
+        "name": "panel1",
+        "elements": [
+         {
+          "type": "multipletext",
+          "name": "Name",
+          "isRequired": true,
+          "items": [
+           {
+            "name": "first_name",
+            "title": "First name"
+           },
+           {
+            "name": "last_name",
+            "title": "Surname"
+           }
+          ]
+         },
+         {
+          "type": "radiogroup",
+          "name": "sex",
+          "title": "Sex",
+          "choices": [
+           {
+            "value": "male",
+            "text": "Male"
+           },
+           {
+            "value": "female",
+            "text": "Female"
+           },
+           {
+            "value": "other",
+            "text": "Other"
+           }
+          ],
+          "colCount": 3
+         },
+         {
+          "type": "text",
+          "name": "DOB",
+          "title": "DOB"
+         }
+        ]
+       }
       ],
-      "colCount": 3
-      }
-    ],
-    "title": "Client Search"
-    },
-     
+      "visibleIf": "{ClientLookupMethods} = 'by_name'",
+      "title": "Client Lookup by Name"
+     },     
    {
     "name": "survey_meta",
     "elements": [
