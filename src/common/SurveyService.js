@@ -1,8 +1,14 @@
 
 import myAxios from './api';
 
-function buildURL(request_type, client_id, id_type){
-  return `${myAxios.defaults.baseURL}?request_type=${request_type}&client_id=${client_id}&id_type=${id_type}`;
+function buildURL(request_type, params){
+  let pstring  = '';
+  for (let [key, value] of Object.entries(params)) {
+    pstring = `${pstring}&${key}=${value}`;
+  }
+  console.log("p string ", pstring);
+  return `${myAxios.defaults.baseURL}?request_type=${request_type}${pstring}`;
+  //return `${myAxios.defaults.baseURL}?request_type=${request_type}&client_id=${client_id}&id_type=${id_type}`;
 }
 
 export default {
@@ -13,9 +19,19 @@ export default {
   //     `${myAxios.defaults.baseURL}?request_type=get_partial_ia&client_id=${client_id}&id_type=${id_type}`);
   //   // return myAxios.get(`/survey_answers/${clientId}`);
   // },
-  getLastSurveyData (client_id, id_type)  {
+  getLastSurveyDataByID (client_id, id_type)  {
     console.log(`get last (possibly partial) survey for client ${client_id}`);
-    const url = buildURL('get_last_ia', client_id, id_type);
+    let params = {client_id : client_id, id_type: id_type};
+    const url = buildURL('get_last_ia', params);
+    return myAxios.get(url);
+    // return myAxios.get(`/survey_answers/${clientId}`);
+  },
+
+    // },
+  getLastSurveyDataBySLKDeets (fname, lname, sex, DOB)  {
+    console.log(`get last (possibly partial) survey for client ${fname}`);
+    let params = {first_name : fname, last_name: lname, sex: sex, DOB: DOB};
+    const url = buildURL('get_last_ia_slkdeets', params);
     return myAxios.get(url);
     // return myAxios.get(`/survey_answers/${clientId}`);
   },
@@ -28,11 +44,29 @@ export default {
       console.info("SurveyService: client id not in data");
       return undefined;
     }
+    console.log("savePartialSurvey survey data ------------------");
+    console.log(surveyData);
 
-    const url = buildURL('put_partial_ia', surveyData['client_id'], surveyData['id_type']);
+    const url = buildURL('put_partial_ia', {id:surveyData['id']});// {client_id=surveyData['client_id'], id_type=surveyData['id_type']});
     return myAxios.put(url, surveyData);
     //return myAxios.put(`/partial/${clientId}`, surveyData);
+  },
+
+  addPartialSurvey (surveyData)  {
+    console.log('ADD New partial', surveyData);
+    if (!( 'client_id'  in surveyData)){
+      console.info("SurveyService: client id not in data");
+      return undefined;
+    }
+    console.log("add  survey data ------------------");
+    console.log(surveyData);
+
+    const url = buildURL('post_partial_ia');
+    return myAxios.post(url, surveyData);
+    //return myAxios.put(`/partial/${clientId}`, surveyData);
   }
+
+
 } 
 
 // {

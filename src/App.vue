@@ -25,7 +25,29 @@ import swipeEvent from './swipe.js';
 import setupAnimation from './transition.js';
 import  SurveyService from  './common/SurveyService';
 
+/**
+ * Remote State /DB sync.
+ * Local DB stores all the clients data (offline use).i,.e, it is sync';d to the server/
+ *  The server should contain the knowledge of , which tablet has downloaded upto what version of hthe database ?
+ * 
+ *   Table ClientSurveys
+ *      * All
+ *          ID :1 SLK : ALLAF1981 ; PDC: Alcohol
+ *              LastModified: 2020-03-10, by Tablet-2
+ *              LastModified: 2020-03-10, by Tablet-2
+*           ID :2 SLK : JAGGGE1994 ; PDC: Cannabis
+               v1: LastModified: 2020-01-31, by Tablet-1
+ *             v2: LastModified: 2020-02-01, by Tablet-1
+            
+ * 
+ * Tablet-1 IndexDB Downloads 
+ *          ..
+ *           ID :2 SLK : JAGGGE1994 ; PDC: Cannabis
+                v1: LastModified: 2020-01-31, by Tablet-1
 
+
+  Use PWA -> web push notifications to update all databases as soon as they are online
+ */
     //    "goNextPageAutomatic": true,
     // "showNavigationButtons": false,
 var Survey = SurveyVue.Survey;
@@ -52,54 +74,104 @@ export default {
   },
 
   mounted() {
-    this.survey.data = this.fullSurvey();
+    //this.survey.data = this.fullSurvey();
+    
     setupAnimation(this.survey, this.doAnimation);
   },
 
   methods: {
       ...mapActions([
-        'GET_LAST_SURVEY',
-        'UPDATE_SURVEY_DATASERVER',
+        'GET_LAST_SURVEY_BY_ID', 'GET_LAST_SURVEY_BY_SLKDEETS',
+        'UPDATE_SURVEY_DATASERVER', 'ADD_SURVEY_DATASERVER'
       ]),
       ...mapGetters(['fullSurvey']),
 
       onSwipeHorizontal: function(event) { swipeEvent(this.survey, event) ;},
-
+      checkAssign: function (objectToAssign, errors, data) {
+        for (let x in Object.keys(data)) {
+             let sourceObj = data[x];
+             if (!sourceObj || sourceObj[x]) {
+                errors[x] = `Missing ${x}`;
+                return -1;
+             }
+             objectToAssign[x] = sourceObj[x];
+        }
+        return 1;
+      },
 //THIS IS RUN EVERY TIME  IF TIED TO  model.onServerValidateQuestions?
       lookupClient: async function (survey, options) {
             //options.data contains the data for the current page.
             // if (! survey.isFirstPage){
-            console.log("SURVEYons::::::", survey);
+            console.log("lookupClient: SURVEYons::::::", survey);
             console.log("options::::::", options);
-            if(! ('ClientLookupMethods' in survey.data ) ||
-               ! ('client_id' in survey.data) ||
-               survey.data.team_staff) {// only try to look up the client in 2nd page, otherwise return
+            if (survey.currentPageNo != 1 ) {
+           // if( survey.data.team_staff || // beyond page 2
+            //    ((! survey.isFirstPage) && ! ('ClientLookupMethods' in survey.data)) ||
+             //   (!survey.data['by_id'] && !survey.data['by_name'] ) ) {
               options.complete();
               return;
             }
-            const client_id =  survey.data['client_id'];
-            if (!client_id) {
-              options.errors["client_id"] = "Missing Client ID";
-              options.complete();
-              return;
+        
+            let err = '' , err_key = '', lookup_details = {}// , fn ='';
+            if (survey.data['client_id']) {
+              let client_id = survey.data['client_id'];
+              let id_type = survey.data['id_type'];
+              if (!client_id || !id_type) {
+                options.errors["client_id"] = "Missing Client ID/ ID Type";
+                options.complete();
+                return;
+              }
+              //fn = this.GET_LAST_SURVEY_BY_ID; 
+              lookup_details['fn'] =  this.GET_LAST_SURVEY_BY_ID;
+              lookup_details['client_id'] =  client_id;
+              lookup_details['id_type'] =  id_type;              
+              err = `'${client_id}' with type: '${id_type}' was not found.`;
+              err_key = 'client_id';
+            } else {
+              console.log(survey.data);
+              let keysToAdd = ['first_name', 'last_name', 'sex', 'DOB'];
+              let result = this.checkAssign(lookup_details, options.errors,
+                  { 'first_name': survey.data.Name, 'last_name': survey.data.Name,
+                    'sex' : survey.data, 'DOB': survey.data }
+              );
+              if (!result) {
+                console.log(" ERRORRRRRRRRRRRRRRRRR ", options.errors);
+              }
+              lookup_details['fn'] = this.GET_LAST_SURVEY_BY_SLKDEETS;
+              //fn = this.GET_LAST_SURVEY_BY_SLKDEETS;
+
+              console.log(lookup_details);
+              err = `'${lookup_details['first_name']}' ${lookup_details['last_name']} DOB: '${lookup_details['DOB']}' was not found.`;
+              err_key = 'first_name';
             }
+             // what if looking up by name etc.
+
             try {
-              var id_type =  survey.data["id_type"];
+              let id_type =  survey.data["id_type"];
               // delete survey.data['ClientLookupMethods'];
-              console.log("CALLING ------ GET LAST SURVEY -0-------");
-              await this.GET_LAST_SURVEY(client_id+ ","+ id_type);
+              console.log("CALLING ------ GET LAST SURVEY -0-------", lookup_details);
+              let getAction = lookup_details['fn'];
+              await getAction(lookup_details);
+              //await this.GET_LAST_SURVEY_BY_ID(lookup_details);
               
               let res = this.fullSurvey();
               console.log("got full survey ", res);
-              if (!res) {
-                let err = `'${client_id}' with type: '${id_type}' was not found.`;
-                options.errors["client_id"] = err;
-        
+              if (!res ) {             
+                console.log(`Adding error ${err} to options [${err_key}]`) ;
+                options.errors[err_key] = err;
               } 
-              //else{
-               //   survey.showNavigationButtons = true;
-                //  survey.goNextPageAutomatic = false;
-              //}
+
+              // else if client exists but no survey was ever done.
+
+              else{ // partial survey 
+                  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>RESSSSSSSSSSSSSSSSSS \n\n");
+                  console.log( res);
+                //if there was no survey retrieved mark it as new addition to client's list of surveys
+                 this.survey['new_survey'] = true; // this will do a post rather than a PUT
+                 survey['sendResultOnPageNext'] = true;
+                 survey.showNavigationButtons = true;
+                 survey.goNextPageAutomatic = false;
+              }
               
               options.complete();
               // this.survey.data['clientDataReceived'] = true;
@@ -110,35 +182,31 @@ export default {
               console.error(" ERROR DURING GET LAST SURBEY" , err)
             }
       },
-      setPDC: function(prefill_data) {
-        let pdc = prefill_data['episodes'][0]['PDC']
-        console.log("PDC: " + pdc)
-        this.survey.setValue('pdcmthd', {'pdcdeets': {'PDC': pdc.toLowerCase()}})
-      }
+
 },
 
   data() {
     let dirtyData = false;
     let json = surveyQuestions;
-    json['sendResultOnPageNext'] = true;
+    
     //json = setOfficialPDC(json);
     let me = this;
-    var model = new SurveyVue.Model(json);
+    var model = new SurveyVue.Model(surveyQuestions);
 
     model.onServerValidateQuestions.add(this.lookupClient);
-    model.onCurrentPageChanging.add((senderModel, options)=>{
-             console.log("onCurrentPageChanging sender model", senderModel);
-       console.log("onCurrentPageChanging optiosn", options);
-      //  if (options.newCurrentPage.name == 'client_lookup_id' &&
-      //     options.oldCurrentPage.name != 'LookupOptions') {
-      //       // hit the back button and could potentially change
-      //       console.log("ADDDDDDDDDDDDDD LOGGGICCCC..delete store data");
-      //     }
-    })
+    // model.onCurrentPageChanging.add((senderModel, options)=>{
+    //          console.log("onCurrentPageChanging sender model", senderModel);
+    //    console.log("onCurrentPageChanging optiosn", options);
+    //   //  if (options.newCurrentPage.name == 'client_lookup_id' &&
+    //   //     options.oldCurrentPage.name != 'LookupOptions') {
+    //   //       // hit the back button and could potentially change
+    //   //       console.log("ADDDDDDDDDDDDDD LOGGGICCCC..delete store data");
+    //   //     }
+    // })
 
-    // model.onComplete.add(function(survey, options) {
-    //     console.log(JSON.stringify(survey.data));
-    // });
+    model.onComplete.add(function(survey, options) {
+        console.log(JSON.stringify(survey.data));
+    });
     //model.onFirstPageIsStartedChanged
     model.onValueChanged.add((senderModel, options) => {
        console.log("value was changed sender model", senderModel);
@@ -171,17 +239,33 @@ export default {
       me.dirtyData = true;
     });
 
+/** onPartialSend
+ * Restore answered questions for in-completed Survey
+    Another common scenario, when you have a large survey and a user may not want to complete it during one session. 
+    Again, the solution is to restore the answered question and additionally the current page. 
+    If a survey is filled by login users, you may store the current answered results in your database. 
+    However, in the most scenarios, using a browser local storage works great as well, since in the most cases a user will comeback by using the same browser.
+    Below is the code that implements restoring answered questions and current page from local storage. 
+    We are setting the survey.sendResultOnPageNext property to true. As result, survey.onPartialSend event will be fired, to make our life easier.
+    */
     model.onPartialSend.add(function(model) {
-      if (me.dirtyData){
+      console.log("on partial send dirty ? " + me.dirtyData);
+      if (me.dirtyData && 
+        Object.keys(model.data).length > 5) { //there is something to store besides the client name, id ( wcih is already known)
         // if ('ClientLookupMethods' in model.data) {
         //   console.log("onPartial send MODEL  ...", model);
         //  // me.lookupClient(model, options);
         //   //delete model.data['ClientLookupMethods'];
         //   return;
         // } 
-        me.UPDATE_SURVEY_DATASERVER(model.data);
+        if (model.hasOwnProperty('new_survey')) { // get back the Survey-ID so we can PUT to it in the following pages
+          me.ADD_SURVEY_DATASERVER(model.data);
+        } else {
+          console.log(" GOING TO UPPPDATE EXISTING ");
+          me.UPDATE_SURVEY_DATASERVER(model.data);
+        }
         me.dirtyData = false;
-        console.log("updated >>>>>>>>survey Data", model.data);
+        console.log(`updated >>>>>>>>survey Data ${Object.keys(model.data).length }`, model.data);
       }
     });
 
@@ -216,3 +300,8 @@ export default {
       //       // _this.dialog = false
       //   })
       // },
+            // setPDC: function(prefill_data) {
+      //   let pdc = prefill_data['episodes'][0]['PDC']
+      //   console.log("PDC: " + pdc)
+      //   this.survey.setValue('pdcmthd', {'pdcdeets': {'PDC': pdc.toLowerCase()}})
+      // }

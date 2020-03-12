@@ -17,9 +17,10 @@ export const mutations = {
 
   updateSurveyFormData (state, surveyData) {
       // console.log("state", state)
-      console.log("updateSurveyData::", surveyData)
+      console.log("updateSurvey_Form_Data::", surveyData)
       if (surveyData === undefined) {
-        Object.assign(state, undefined);
+          Vue.set(state, 'survey', {});
+        //Object.assign(state, undefined);
       }
       else {
         if ('ClientLookupMethods' in surveyData  ) {
