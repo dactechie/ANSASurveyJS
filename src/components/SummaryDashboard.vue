@@ -3,15 +3,14 @@
       <h2>Intial Assessment &nbsp; &nbsp;<input size="50" type="text"
             placeholder="search ANSA questions/options"/></h2>
       
-      <div :v-for="s in (sections, index)" :key="index" class="card shadow2">
-        <!-- <div class="progress" style="width:70%"></div> -->
+      <!-- <div :v-for="s in (sections, index)" :key="index" class="card shadow2">
+       
         <div class="content">
           <b>{{s.title}}</b>
-          <!-- <DashboardQuestions :questions="s.questions" /> -->
-          <!-- <p class="percentage">70%</p> -->
+
         </div>
       </div>
-    
+     -->
   </div>
 </template>
 

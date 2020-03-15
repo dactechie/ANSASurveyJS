@@ -1,5 +1,8 @@
 
 
+1. Add better UI Slider - 
+
+
 Q. How do we remove the need for Staff Login into the survey App, at the same time minimize the amount of typing required on the tablet device.
     For repeat clients, staff may only need to edit small amounts(if any) of text(typed) information, as we are preloading it from previous assessments.
     So the main typing (small, but multiple fields) is Firstname, Lastname, DOB (not really..picker)

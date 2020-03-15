@@ -5,11 +5,12 @@
   -->
   <div id="app" v-hammer:swipe.horizontal="onSwipeHorizontal">
     <button id="show-modal" @click="showModal = true">Status/Overview</button>
-    
+    <transition name="fade">
      <SummaryModal v-if="showModal" @close="showModal = false" > 
         <!-- @navTo="selectPage" -->
       <h3 slot="header">Summary View</h3>
     </SummaryModal>
+    </transition>
 
     <survey :survey="survey"></survey>
   </div>
@@ -20,10 +21,10 @@ import * as SurveyVue from "survey-vue";
 import { mapActions, mapGetters } from 'vuex'
 import surveyQuestions from  './questions.json';
 import SummaryModal from './SummaryModal';
-import drugs from './schema/drugs.json';
+import drugs from './schema/drugs.json';  // TODO incorporate this into the dropdowns
 import swipeEvent from './swipe.js';
 import setupAnimation from './transition.js';
-import  SurveyService from  './common/SurveyService';
+import setupLookup from './helpers.js';
 
 /**
  * Remote State /DB sync.
@@ -55,7 +56,18 @@ SurveyVue
     .StylesManager
     .applyTheme("modern");
 
-// Survey.FunctionFactory
+function isValidLookupIds (type_client_id) {
+
+  let client_id = type_client_id[1];  
+  //TODO : use SLK-pattern from schema/schema.json
+  return (type_client_id[0] === 'SLK') ?
+          /[A-Z0-9]{7}(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])(19|20)[0-9]{2}(1|2|9)/.test(client_id)
+          :
+          Number.isInteger(client_id);  
+}
+
+
+// SurveyVue.FunctionFactory
 //     .Instance
 //     .register("isClientSet", Vue.pro, true);
 
@@ -72,11 +84,17 @@ export default {
     Survey,
     SummaryModal,
   },
-
+  created() {
+        SurveyVue
+    .FunctionFactory
+    .Instance
+    .register("isValidLookupIds", isValidLookupIds);
+  },
   mounted() {
     //this.survey.data = this.fullSurvey();
-    
+  
     setupAnimation(this.survey, this.doAnimation);
+
   },
 
   methods: {
@@ -87,17 +105,7 @@ export default {
       ...mapGetters(['fullSurvey']),
 
       onSwipeHorizontal: function(event) { swipeEvent(this.survey, event) ;},
-      checkAssign: function (objectToAssign, errors, data) {
-        for (let x in Object.keys(data)) {
-             let sourceObj = data[x];
-             if (!sourceObj || sourceObj[x]) {
-                errors[x] = `Missing ${x}`;
-                return -1;
-             }
-             objectToAssign[x] = sourceObj[x];
-        }
-        return 1;
-      },
+
 //THIS IS RUN EVERY TIME  IF TIED TO  model.onServerValidateQuestions?
       lookupClient: async function (survey, options) {
             //options.data contains the data for the current page.
@@ -111,52 +119,22 @@ export default {
               options.complete();
               return;
             }
-        
-            let err = '' , err_key = '', lookup_details = {}// , fn ='';
-            if (survey.data['client_id']) {
-              let client_id = survey.data['client_id'];
-              let id_type = survey.data['id_type'];
-              if (!client_id || !id_type) {
-                options.errors["client_id"] = "Missing Client ID/ ID Type";
-                options.complete();
-                return;
-              }
-              //fn = this.GET_LAST_SURVEY_BY_ID; 
-              lookup_details['fn'] =  this.GET_LAST_SURVEY_BY_ID;
-              lookup_details['client_id'] =  client_id;
-              lookup_details['id_type'] =  id_type;              
-              err = `'${client_id}' with type: '${id_type}' was not found.`;
-              err_key = 'client_id';
-            } else {
-              console.log(survey.data);
-              let keysToAdd = ['first_name', 'last_name', 'sex', 'DOB'];
-              let result = this.checkAssign(lookup_details, options.errors,
-                  { 'first_name': survey.data.Name, 'last_name': survey.data.Name,
-                    'sex' : survey.data, 'DOB': survey.data }
-              );
-              if (!result) {
-                console.log(" ERRORRRRRRRRRRRRRRRRR ", options.errors);
-              }
-              lookup_details['fn'] = this.GET_LAST_SURVEY_BY_SLKDEETS;
-              //fn = this.GET_LAST_SURVEY_BY_SLKDEETS;
+            
+            let lkpdeets = setupLookup(survey, 
+                                {'by_id':this.GET_LAST_SURVEY_BY_ID, 
+                                'by_name': this.GET_LAST_SURVEY_BY_SLKDEETS });
 
-              console.log(lookup_details);
-              err = `'${lookup_details['first_name']}' ${lookup_details['last_name']} DOB: '${lookup_details['DOB']}' was not found.`;
-              err_key = 'first_name';
-            }
-             // what if looking up by name etc.
-
-            try {
-              let id_type =  survey.data["id_type"];
+            try {      
               // delete survey.data['ClientLookupMethods'];
-              console.log("CALLING ------ GET LAST SURVEY -0-------", lookup_details);
-              let getAction = lookup_details['fn'];
-              await getAction(lookup_details);
-              //await this.GET_LAST_SURVEY_BY_ID(lookup_details);
+              console.log("CALLING ------ GET LAST SURVEY -0-------", lkpdeets);
+              let doLookup = lkpdeets['fn'];
+              
+              await doLookup(lkpdeets);
               
               let res = this.fullSurvey();
               console.log("got full survey ", res);
-              if (!res ) {             
+              if (!res ) {
+                let err = lkpdeets['err'], err_key = lkpdeets['err_key'];
                 console.log(`Adding error ${err} to options [${err_key}]`) ;
                 options.errors[err_key] = err;
               } 
@@ -168,6 +146,7 @@ export default {
                   console.log( res);
                 //if there was no survey retrieved mark it as new addition to client's list of surveys
                  this.survey['new_survey'] = true; // this will do a post rather than a PUT
+                 //what is the difference between this. and just survey ?
                  survey['sendResultOnPageNext'] = true;
                  survey.showNavigationButtons = true;
                  survey.goNextPageAutomatic = false;
@@ -260,12 +239,15 @@ export default {
         // } 
         if (model.hasOwnProperty('new_survey')) { // get back the Survey-ID so we can PUT to it in the following pages
           me.ADD_SURVEY_DATASERVER(model.data);
+          // only this once. it is no longer new.
+          delete model['new_survey'];
         } else {
           console.log(" GOING TO UPPPDATE EXISTING ");
           me.UPDATE_SURVEY_DATASERVER(model.data);
         }
         me.dirtyData = false;
-        console.log(`updated >>>>>>>>survey Data ${Object.keys(model.data).length }`, model.data);
+        console.log(`updated >>>>>>>>survey Data ${Object.keys(model.data).length }`);
+        console.log(model.data);
       }
     });
 
@@ -286,6 +268,22 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
+
+.fade-enter {
+  opacity: 0;
+
+}
+
+.fade-enter-active,  .fade-leave-active {
+  transition: opacity 0.5s ease-out;
+}
+
+.fade-leave-to {
+  opacity: 0;
+}
+
+
+
 </style>
       // sendDataToTheServer: function (isComplete, data) {
       //   var text = isComplete ? "The survey is completed" : "The survey is not completed"; 

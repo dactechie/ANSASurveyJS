@@ -1,219 +1,191 @@
 {
   "title": "ANSA Initial Assessment",
-  "showNavigationButtons": false,
-  "goNextPageAutomatic": true,
   "pages": [
-    {
-      "name": "LookupOptions",
-      "elements": [
-       {
-        "type": "radiogroup",
-        "name": "ClientLookupMethods",
-        "isRequired": true,
-        "title": "Lookup Client by : ",
-        "titleLocation": "left",
-        "commentText": "jhvjhv",
-        "choices": [
-         {
-          "value": "by_name",
-          "text": "Name, Sex, DOB"
-         },
-         {
-          "value": "by_id",
-          "text": "By DB-ID / SLK"
-         }
-        ],
-        "colCount": 2
-       }
-      ]
-     },
-     {
-      "name": "client_lookup_id",
-      "elements": [
-       {
-        "type": "panel",
-        "name": "ID_Lookup_Panel",
-        "elements": [
-         {
-          "type": "text",
-          "name": "client_id",
-          "title": "ID  - SLK / Database ID",
-          "isRequired": true
-         },
-         {
-          "type": "radiogroup",
-          "name": "id_type",
-          "title": "ID Type",
-          "isRequired": true,
-          "choices": [
-           {
-            "value": "SLK",
-            "text": "SLK"
-           },
-           {
-            "value": "MCARE_ID",
-            "text": "Mastercare"
-           },
-           {
-            "value": "CCARE_ID",
-            "text": "Communicare"
-           }
-          ],
-          "colCount": 3
-         }
-        ]
-       }
-      ],
-      "visibleIf": "{ClientLookupMethods} = 'by_id'",
-      "title": "Client Lookup by ID"
-     },
-     {
-      "name": "client_lookup_name",
-      "elements": [
-       {
-        "type": "panel",
-        "name": "panel1",
-        "elements": [
-         {
-          "type": "multipletext",
-          "name": "Name",
-          "isRequired": true,
-          "items": [
-           {
-            "name": "first_name",
-            "title": "First name"
-           },
-           {
-            "name": "last_name",
-            "title": "Surname"
-           }
-          ]
-         },
-         {
-          "type": "radiogroup",
-          "name": "sex",
-          "title": "Sex",
-          "choices": [
-           {
-            "value": "male",
-            "text": "Male"
-           },
-           {
-            "value": "female",
-            "text": "Female"
-           },
-           {
-            "value": "other",
-            "text": "Other"
-           }
-          ],
-          "colCount": 3
-         },
-         {
-          "type": "text",
-          "name": "DOB",
-          "title": "DOB"
-         }
-        ]
-       }
-      ],
-      "visibleIf": "{ClientLookupMethods} = 'by_name'",
-      "title": "Client Lookup by Name"
-     },     
    {
-    "name": "survey_meta",
+    "name": "LookupOptions",
     "elements": [
      {
-      "type": "matrixdropdown",
-      "name": "team_staff",
-      "title": "Your Directions / Pathways Details",
-      "columns": [
-       {
-        "name": "team",
-        "title": "Team",
-        "cellType": "dropdown",
-        "choices": [
-         {
-          "value": "eurobodalla",
-          "text": "Eurobodalla"
-         },
-         {
-          "value": "monaro",
-          "text": "Monaro"
-         },
-         {
-          "value": "bega",
-          "text": "Bega"
-         },
-         {
-          "value": "tss",
-          "text": "TSS"
-         }
-        ]
-       },
-       {
-        "name": "staff",
-        "title": "Staff",
-        "cellType": "dropdown"
-       }
-      ],
-      "columnLayout": "vertical",
+      "type": "radiogroup",
+      "name": "ClientLookupMethods",
+      "title": "Lookup Client by : ",
+      "isRequired": true,
+      "titleLocation": "left",
+      "commentText": "jhvjhv",
       "choices": [
        {
-        "value": 1,
-        "text": "Glenda",
-        "visibleIf": "{team_staff.r1.team} = \"eurobodalla\""
+        "value": "by_name",
+        "text": "Name, Sex, DOB"
        },
        {
-        "value": 2,
-        "text": "Jacinta",
-        "visibleIf": "{team_staff.r1.team} = \"eurobodalla\""
-       },
-       {
-        "value": 3,
-        "text": "Vic",
-        "visibleIf": "{team_staff.r1.team} = \"eurobodalla\""
-       },
-       {
-        "value": 4,
-        "text": "Tracy",
-        "visibleIf": "{team_staff.r1.team} = \"eurobodalla\""
-       },
-       {
-        "value": 5,
-        "text": "Aaron",
-        "visibleIf": "{team_staff.r1.team} = \"monaro\""
-       },
-       {
-        "value": "6",
-        "text": "Belinda",
-        "visibleIf": "{team_staff.r1.team} = \"monaro\""
-       },
-       {
-        "value": "7",
-        "text": "Michelle",
-        "visibleIf": "{team_staff.r1.team} = \"bega\""
-       },
-       {
-        "value": "9",
-        "text": "Corrina",
-        "visibleIf": "{team_staff.r1.team} = \"tss\""
-       },
-       {
-        "value": "8",
-        "text": "MJ",
-        "visibleIf": "{team_staff.r1.team} = \"tss\""
+        "value": "by_id",
+        "text": "By DB-ID / SLK"
        }
       ],
-      "rows": [
+      "colCount": 2
+     }
+    ]
+   },
+   {
+    "name": "client_lookup_id",
+    "elements": [
+     {
+      "type": "radiogroup",
+      "name": "id_type",
+      "title": "ID Type",
+      "isRequired": true,
+      "choices": [
        {
-        "value": "r1",
-        "text": "Your contact"
+        "value": "SLK",
+        "text": "SLK"
+       },
+       {
+        "value": "MCARE_ID",
+        "text": "Mastercare"
+       },
+       {
+        "value": "CCARE_ID",
+        "text": "Communicare"
+       }
+      ],
+      "colCount": 3
+     },
+     {
+      "type": "text",
+      "name": "client_id",
+      "title": "Database ID",
+      "isRequired": true,
+      "validators": [
+       {
+        "type": "expression",
+        "text": "Invalid Value",
+        "expression": "isValidLookupIds({id_type}, {client_id})"       
        }
       ]
      }
     ],
-    "title": "Survey Meta Information"
+    "visibleIf": "{ClientLookupMethods} = 'by_id'",
+    "title": "Client Lookup by ID"
+   },
+   {
+    "name": "client_lookup_name",
+    "elements": [
+     {
+      "type": "text",
+      "name": "first_name",
+      "useDisplayValuesInTitle": false,
+      "titleLocation": "hidden",
+      "placeHolder": "First name"
+     },
+     {
+      "type": "text",
+      "name": "last_name",
+      "useDisplayValuesInTitle": false,
+      "titleLocation": "hidden",
+      "placeHolder": "Surname"
+     },
+     {
+      "type": "radiogroup",
+      "name": "sex",
+      "indent": 10,
+      "titleLocation": "hidden",
+      "choices": [
+       {
+        "value": "male",
+        "text": "Male"
+       },
+       {
+        "value": "female",
+        "text": "Female"
+       },
+       {
+        "value": "other",
+        "text": "Other"
+       }
+      ],
+      "colCount": 3
+     },
+     {
+      "type": "text",
+      "name": "DOB",
+      "title": "DOB",
+      "inputType": "date"
+     }
+    ],
+    "visibleIf": "{ClientLookupMethods} = 'by_name'",
+    "title": "Client Lookup by Name"
+   },
+   {
+    "name": "survey_meta",
+    "elements": [
+     {
+      "type": "radiogroup",
+      "name": "team_name",
+      "defaultValue": "eurobodalla",
+      "isRequired": true,
+      "titleLocation": "hidden",
+      "choices": [
+       {
+        "value": "eurobodalla",
+        "text": "Eurobodalla"
+       },
+       {
+        "value": "monaro",
+        "text": "Monaro"
+       },
+       {
+        "value": "bega",
+        "text": "Bega"
+       }
+      ],
+      "colCount": 3
+     },
+     {
+      "type": "radiogroup",
+      "name": "staff_name",
+      "isRequired": true,
+      "titleLocation": "hidden",
+      "choices": [
+       {
+        "value": "vic",
+        "text": "Vic",
+        "visibleIf": "{team_name} = 'eurobodalla'"
+       },
+       {
+        "value": "glenda",
+        "text": "Glenda",
+        "visibleIf": "{team_name} = 'eurobodalla'"
+       },
+       {
+        "value": "jacinta",
+        "text": "Jacinta",
+        "visibleIf": "{team_name} = 'eurobodalla'"
+       },
+       {
+        "value": "tracy",
+        "text": "Tracy",
+        "visibleIf": "{team_name} = 'eurobodalla'"
+       },
+       {
+        "value": "aaron",
+        "text": "Aaron",
+        "visibleIf": "{team_name} = 'monaro'"
+       },
+       {
+        "value": "belinda",
+        "text": "Belinda",
+        "visibleIf": "{team_name} = 'monaro'"
+       },
+       {
+        "value": "michelle",
+        "text": "Michelle",
+        "visibleIf": "{team_name} = 'bega'"
+       }
+      ],
+      "colCount": 3
+     }
+    ],
+    "questionTitleLocation": "hidden",
+    "title": "Team and Staff"
    },
    {
     "name": "client_info",
@@ -238,8 +210,6 @@
         "title": "Gender",
         "cellType": "dropdown"
        }
-
-
       ],
       "columnLayout": "vertical",
       "choices": [
@@ -258,102 +228,112 @@
       ],
       "cellType": "text",
       "rows": [
-       "."
+       "rows_sex"
       ]
      },
-          {
-            "type": "panel",
-            "name": "panel2",
-            "elements": [
-                {
-                    "type": "text",
-                    "inputType": "date",
-                    "isRequired": true,
-                    "name": "birthDate",
-                    "startWithNewLine": false,
-                    "title": "Date of birth:"
-                }
-            ],
-            "questionTitleLocation": "left"
-          
-        }
-
+     {
+      "type": "panel",
+      "name": "panel2",
+      "elements": [
+       {
+        "type": "text",
+        "name": "birthDate",
+        "startWithNewLine": false,
+        "title": "Date of birth:",
+        "isRequired": true,
+        "inputType": "date"
+       }
+      ],
+      "questionTitleLocation": "left"
+     }
     ],
     "title": "Client Basic Information"
    },
    {
-    "name": "substance_use",
+    "name": "main_substance_use",
     "elements": [
      {
-      "type": "matrixdropdown",
-      "name": "pdc_and_usage",
-      "startWithNewLine": false,
-      "title": "Principal Substance of Concern and Method of Use",
-      "columns": [
+      "type": "radiogroup",
+      "name": "pdc",
+      "indent": 3,
+      "isRequired": true,
+      "titleLocation": "hidden",
+      "choices": [
        {
-        "name": "PDC",
-        "title": "PDC",
-        "choices": [
-         {
-          "value": "alcohol",
-          "text": "Alcohol"
-         },
-         {
-          "value": "nicotine",
-          "text": "Nicotine"
-         },
-         {
-          "value": "amphetamine",
-          "text": "Amphetamine"
-         },
-         {
-          "value": "cocaine",
-          "text": "Cocaine"
-         },
-         {
-          "value": "opioids",
-          "text": "Opioids"
-         }
-        ]
+        "value": "alcohol",
+        "text": "Alcohol"
        },
        {
-        "name": "pdcmthd",
-        "title": "Method of Use",
-        "choices": [
-         {
-          "value": "ingests",
-          "text": "Ingests"
-         },
-         {
-          "value": "injects",
-          "text": "Injects"
-         }
-        ]
+        "value": "amphetamine",
+        "text": "Amphetamines"
        },
        {
-        "name": "pdc_ndaysconsumed",
-        "title": "How many days in the last 4 weeks",
-        "cellType": "text",
-        "requiredIf": "{pdcmthd.pdcdeets.pdc} empty",
-        "validators": [
-         {
-          "type": "numeric",
-          "minValue": 0,
-          "maxValue": 28
-         }
-        ],
-        "placeHolder": "0",
-        "inputType": "number"
+        "value": "cocaine",
+        "text": "Cocaine"
+       },
+       {
+        "value": "opioid",
+        "text": "Opioids"
+       },
+       {
+        "value": "nicotine",
+        "text": "Nicotine"
+       },
+       {
+        "value": "sedative",
+        "text": "Sedatives"
        }
       ],
-      "columnLayout": "vertical",
-      "rows": [
-       {
-        "value": "pdcdeets",
-        "text": "Principal substance details"
-       }
-      ]
+      "colCount": 3
      },
+     {
+      "type": "radiogroup",
+      "name": "pdc_method_of_use",
+      "visible": false,
+      "visibleIf": "{pdc} notempty",
+      "indent": 3,
+      "isRequired": true,
+      "titleLocation": "hidden",
+      "choices": [
+       {
+        "value": "ingests",
+        "text": "Ingests",
+        "visibleIf": "{pdc} = 'alcohol' or {pdc} = 'nicotine' or {pdc} = 'sedative'"
+       },
+       {
+        "value": "injects",
+        "text": "Injects",
+        "visibleIf": "{pdc} = 'amphetamine' or {pdc} = 'opioid'"
+       },
+       {
+        "value": "inhales",
+        "text": "Inhales",
+        "visibleIf": "{pdc} = 'nicotine'"
+       },
+       {
+        "value": "transdermal",
+        "text": "Transdermal",
+        "visibleIf": "{pdc} = 'nicotine'"
+       },
+       {
+        "value": "sublingual",
+        "text": "Sublingual",
+        "visibleIf": "{pdc} = 'nicotine'"
+       },
+       {
+        "value": "smokes",
+        "text": "Smokes",
+        "visibleIf": "{pdc} = 'nicotine'"
+       }
+      ],
+      "colCount": 3
+     }
+    ],
+    "title": "Principal Substance of Concern and Method of Use"
+   },
+   {
+    "name": "other_substance_use",
+    "elements": [
      {
       "type": "paneldynamic",
       "name": "odc",
@@ -361,89 +341,83 @@
       "templateElements": [
        {
         "type": "dropdown",
-        "name": "Drug Type",
+        "name": "drug_type",
         "isRequired": true,
+        "titleLocation": "hidden",
         "choices": [
          {
           "value": "alcohol",
-          "text": "Alcohol"
+          "text": "Alcohol",
+          "visibleIf": "{pdc} <> 'alcohol'"
+         },
+         {
+          "value": "amphetamines",
+          "text": "Amphetamines",
+          "visibleIf": "{pdc} <> 'amphetamine'"
          },
          {
           "value": "opioids",
-          "text": "Opioids"
-         },
-         {
-          "value": "sedatives",
-          "text": "Sedatives"
-         },
-         {
-          "value": "meth",
-          "text": "Meth"
+          "text": "Opioids",
+          "visibleIf": "{pdc} <> 'opioid'"
          },
          {
           "value": "nicotine",
-          "text": "Nicotine"
+          "text": "Nicotine",
+          "visibleIf": "{pdc} <> 'nicotine'"
+         },
+         {
+          "value": "sedatives",
+          "text": "Sedatives",
+          "visibleIf": "{pdc} <> 'sedative'"
          }
         ]
        },
        {
-        "type": "panel",
-        "name": "moreInfo",
-        "elements": [
+        "type": "radiogroup",
+        "name": "odcx_method_of_use",
+        "indent": 3,
+        "requiredIf": "{odc[0].drug_type} notempty",
+        "titleLocation": "hidden",
+        "choices": [
          {
-          "type": "matrixdynamic",
-          "name": "method_of_use",
-          "columns": [
-           {
-            "name": "method",
-            "title": "Method of use",
-            "cellType": "dropdown",
-            "isRequired": true,
-            "choices": [
-             "Ingects",
-             "Smokes",
-             "Injects",
-             "Inhales"
-            ]
-           },
-           {
-            "name": "times_per_period",
-            "title": "In last 28 days",
-            "cellType": "dropdown"
-           }
-          ],
-          "columnLayout": "vertical",
-          "choices": [
-           {
-            "value": "item1",
-            "text": "5"
-           },
-           {
-            "value": "item2",
-            "text": "10"
-           },
-           {
-            "value": "item3",
-            "text": "15"
-           },
-           {
-            "value": "item4",
-            "text": "20"
-           },
-           {
-            "value": "item5",
-            "text": "25"
-           },
-           {
-            "value": "item6",
-            "text": "30"
-           }
-          ],
-          "rowCount": 1,
-          "minRowCount": 1,
-          "maxRowCount": 1
+          "value": "ingests",
+          "text": "Ingests"
+         },
+         {
+          "value": "injects",
+          "text": "Injects",
+          "visibleIf": "{odc[0].drug_type} = 'opioids'"
+         },
+         {
+          "value": "inhales",
+          "text": "Inhales",
+          "visibleIf": "{odc[0].drug_type} = 'amphetamines'"
+         },
+         {
+          "value": "transdermal",
+          "text": "Transdermal",
+          "visibleIf": "{odc[0].drug_type} = 'nicotine'"
+         },
+         {
+          "value": "smokes",
+          "text": "Smokes",
+          "visibleIf": "{odc[0].drug_type} = 'nicotine'"
+         },
+         {
+          "value": "sublingual",
+          "text": "Sublingual",
+          "visibleIf": "{odc[0].drug_type} = 'nicotine'"
          }
-        ]
+        ],
+        "colCount": 3
+       },
+       {
+        "type": "rating",
+        "name": "odcx_how_many_days",
+        "requiredIf": "{odc[0].drug_type} notempty",
+        "rateMin": 0,
+        "rateMax": 28,
+        "rateStep": 2
        }
       ],
       "maxPanelCount": 5,
@@ -454,16 +428,20 @@
       "panelNextText": "Next",
       "showRangeInProgress": false,
       "renderMode": "progressTop"
-     },
+     }
+    ]
+   },
+   {
+    "name": "AODHistory",
+    "elements": [
      {
       "type": "paneldynamic",
-      "name": "question1",
+      "name": "aod_history",
       "title": "AOD History",
       "templateElements": [
        {
         "type": "dropdown",
         "name": "Drug Type",
-        "isRequired": true,
         "choices": [
          {
           "value": "alcohol",
@@ -488,140 +466,93 @@
         ]
        },
        {
-        "type": "panel",
-        "name": "moreInfo",
-        "elements": [
+        "type": "radiogroup",
+        "name": "method_of_use",
+        "visible": false,
+        "indent": 3,
+        "requiredIf": "{aod_history[0].Drug Type} notempty",
+        "titleLocation": "hidden",
+        "choices": [
          {
-          "type": "matrixdynamic",
-          "name": "method_of_use",
-          "columns": [
-           {
-            "name": "age",
-            "title": "Age of First Use"
-           },
-           {
-            "name": "method",
-            "title": "Method of use",
-            "cellType": "dropdown",
-            "choices": [
-             "Ingects",
-             "Smokes",
-             "Injects",
-             "Inhales"
-            ]
-           },
-           {
-            "name": "units",
-            "title": "Units",
-            "cellType": "dropdown",
-            "choices": [
-             {
-              "value": "peg",
-              "text": "Peg"
-             },
-             {
-              "value": "quart",
-              "text": "Quart"
-             },
-             {
-              "value": "shot",
-              "text": "Shot"
-             }
-            ]
-           },
-           {
-            "name": "hoften",
-            "title": "How Often",
-            "cellType": "dropdown",
-            "choices": [
-             {
-              "value": "daily",
-              "text": "Daily"
-             },
-             {
-              "value": "weekly",
-              "text": "Weekly"
-             }
-            ]
-           },
-           {
-            "name": "perday",
-            "title": "How much per day",
-            "cellType": "dropdown",
-            "choices": [
-             {
-              "value": "5",
-              "text": "< 5"
-             },
-             {
-              "value": "10",
-              "text": "5 - 10"
-             },
-             {
-              "value": "20",
-              "text": "11 - 20"
-             },
-             {
-              "value": "40",
-              "text": "21 - 40"
-             },
-             {
-              "value": "60",
-              "text": "41 - 60"
-             },
-             {
-              "value": "80",
-              "text": "61 - 80"
-             },
-             {
-              "value": "100",
-              "text": "81 - 100"
-             },
-             {
-              "value": "200",
-              "text": "100 - 200"
-             },
-             {
-              "value": "2000",
-              "text": "> 200"
-             }
-            ]
-           }
-          ],
-          "columnLayout": "vertical",
-          "choices": [
-           {
-            "value": "item1",
-            "text": "5"
-           },
-           {
-            "value": "item2",
-            "text": "10"
-           },
-           {
-            "value": "item3",
-            "text": "15"
-           },
-           {
-            "value": "item4",
-            "text": "20"
-           },
-           {
-            "value": "item5",
-            "text": "25"
-           },
-           {
-            "value": "item6",
-            "text": "30"
-           }
-          ],
-          "rowCount": 1,
-          "minRowCount": 1,
-          "maxRowCount": 1
+          "value": "ingests",
+          "text": "Ingests",
+          "visibleIf": "{pdc} = 'alcohol' or {pdc} = 'nicotine' and {pdc} = 'sedative'"
+         },
+         {
+          "value": "injects",
+          "text": "Injects",
+          "visibleIf": "{pdc} = 'amphetamine' or {pdc} = 'opioid'"
+         },
+         {
+          "value": "inhales",
+          "text": "Inhales",
+          "visibleIf": "{pdc} = 'nicotine'"
+         },
+         {
+          "value": "transdermal",
+          "text": "Transdermal",
+          "visibleIf": "{pdc} = 'nicotine'"
+         },
+         {
+          "value": "sublingual",
+          "text": "Sublingual",
+          "visibleIf": "{pdc} = 'nicotine'"
          }
-        ]
+        ],
+        "colCount": 3
+       },
+       {
+        "type": "text",
+        "name": "age_first_used",
+        "width": "30",
+        "indent": 1,
+        "title": "Age First Used",
+        "valueName": "5",
+        "defaultValue": 0,
+        "titleLocation": "left",
+        "inputType": "range",
+        "size": 90,
+        "maxLength": 90
+       },
+       {
+        "type": "radiogroup",
+        "name": "how_often_used",
+        "indent": 3,
+        "title": "How Often",
+        "requiredIf": "{aod_history[0].Drug Type} notempty",
+        "titleLocation": "hidden",
+        "choices": [
+         {
+          "value": "daily",
+          "text": "daily"
+         },
+         {
+          "value": "weekly",
+          "text": "weekly"
+         },
+         {
+          "value": "monthly",
+          "text": "monthly"
+         }
+        ],
+        "colCount": 4
+       },
+       {
+        "type": "text",
+        "name": "amount_used",
+        "width": "30",
+        "indent": 1,
+        "title": "Amount per period",
+        "valueName": "f5",
+        "defaultValue": 0,
+        "requiredIf": "{aod_history[0].Drug Type} notempty",
+        "titleLocation": "left",
+        "inputType": "range",
+        "size": 90,
+        "maxLength": 90
        }
       ],
+      "panelCount": 0,
       "maxPanelCount": 5,
       "panelsState": "firstExpanded",
       "panelAddText": "Add Drug",
@@ -629,8 +560,7 @@
       "showRangeInProgress": false,
       "renderMode": "progressTop"
      }
-    ],
-    "title": "Substance Use"
+    ]
    },
    {
     "name": "impact",
@@ -735,7 +665,7 @@
         "text": "ddgfd"
        }
       ],
-      "columnMinWidth": "500",
+      "columnMinWidth": "28",
       "rows": [
        {
         "value": "sex",
@@ -751,8 +681,10 @@
     "title": "Impact of Substance Use"
    }
   ],
+  "showNavigationButtons": "none",
   "showTitle": false,
   "showProgressBar": "bottom",
   "progressBarType": "questions",
+  "goNextPageAutomatic": true,
   "questionTitleTemplate": "{title}"
  }

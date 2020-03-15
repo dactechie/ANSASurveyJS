@@ -12,6 +12,11 @@ import store from './store/index'
 //import _ from 'lodash';
 // import {API_URL} from './constants'
 
+// global component resistration 
+//import BaseIcon from '@/components/BaseIcon.vue'
+//Vue.component('BaseIcon', BaseIcon);
+// auto rego : https://vuejs.org/v2/guide/components-registration.html#Automatic-Global-Registration-of-Base-Components
+
 Vue.config.productionTip = false;
 //Object.defineProperty(Vue.prototype, '$_', { value: _ });
 // const baseAxios = axios.create({ baseURL: API_URL });
@@ -21,6 +26,8 @@ Vue.config.productionTip = false;
 // WARNING .. this may not work .. what if the token is destroyed from local storage
 // Vue.axios.defaults.headers.common['Authorization'] =
 //                                          'Bearer ' + localStorage.getItem('token');
+
+
 Vue.use(VueHammer);
 
 new Vue({
