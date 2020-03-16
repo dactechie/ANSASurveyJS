@@ -25,6 +25,7 @@ import drugs from './schema/drugs.json';  // TODO incorporate this into the drop
 import swipeEvent from './swipe.js';
 import setupAnimation from './transition.js';
 import setupLookup from './helpers.js';
+import {generateSummaryHTML, isValidLookupIds} from '@/common/utils.js';
 
 /**
  * Remote State /DB sync.
@@ -56,15 +57,6 @@ SurveyVue
     .StylesManager
     .applyTheme("modern");
 
-function isValidLookupIds (type_client_id) {
-
-  let client_id = type_client_id[1];  
-  //TODO : use SLK-pattern from schema/schema.json
-  return (type_client_id[0] === 'SLK') ?
-          /[A-Z0-9]{7}(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])(19|20)[0-9]{2}(1|2|9)/.test(client_id)
-          :
-          Number.isInteger(client_id);  
-}
 
 
 // SurveyVue.FunctionFactory
@@ -133,6 +125,7 @@ export default {
               
               let res = this.fullSurvey();
               console.log("got full survey ", res);
+              //this.survey.data = res;
               if (!res ) {
                 let err = lkpdeets['err'], err_key = lkpdeets['err_key'];
                 console.log(`Adding error ${err} to options [${err_key}]`) ;
@@ -142,8 +135,8 @@ export default {
               // else if client exists but no survey was ever done.
 
               else{ // partial survey 
-                  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>RESSSSSSSSSSSSSSSSSS \n\n");
-                  console.log( res);
+                  console.log(" nothing in survey. starting a new one \n\n");
+                  
                 //if there was no survey retrieved mark it as new addition to client's list of surveys
                  this.survey['new_survey'] = true; // this will do a post rather than a PUT
                  //what is the difference between this. and just survey ?
@@ -163,7 +156,17 @@ export default {
       },
 
 },
-
+/***
+ * *  LOADING DATA INTO SURVEY ---------------------------
+ * *  LOADING DATA INTO SURVEY ---------------------------
+ * *  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------
+ *  LOADING DATA INTO SURVEY ---------------------------
+ * 
+ * *    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<
+ *    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<   * https://surveyjs.io/Examples/Library/?id=survey-data&platform=jQuery&theme=modern
+ *    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<
+ *        *  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------
+ */
   data() {
     let dirtyData = false;
     let json = surveyQuestions;
@@ -184,6 +187,7 @@ export default {
     // })
 
     model.onComplete.add(function(survey, options) {
+      
         console.log(JSON.stringify(survey.data));
     });
     //model.onFirstPageIsStartedChanged
@@ -238,6 +242,7 @@ export default {
         //   return;
         // } 
         if (model.hasOwnProperty('new_survey')) { // get back the Survey-ID so we can PUT to it in the following pages
+        console.log("Going to add new survey");
           me.ADD_SURVEY_DATASERVER(model.data);
           // only this once. it is no longer new.
           delete model['new_survey'];
@@ -248,10 +253,15 @@ export default {
         me.dirtyData = false;
         console.log(`updated >>>>>>>>survey Data ${Object.keys(model.data).length }`);
         console.log(model.data);
+        console.log (`Current page ${model.currentPageNo}  . page count ${model.pageCount}`)
+        if (model.currentPageNo ===(model.pageCount -3)){                    
+          let page = model.getPage(model.currentPageNo+2)          
+          page.elements[0].html = generateSummaryHTML(model.data);          
+        }
       }
     });
 
-    return {      
+    return {
       showModal: false,
       survey: model,
       doAnimation:false,

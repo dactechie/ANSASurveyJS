@@ -1,5 +1,6 @@
 
 import myAxios from './api';
+import {getShardFromDate} from './utils';
 
 function buildURL(request_type, params){
   let pstring  = '';
@@ -46,6 +47,8 @@ export default {
     }
     console.log("savePartialSurvey survey data ------------------");
     console.log(surveyData);
+    
+    //surveyData['meta'][''] = new Date()
 
     const url = buildURL('put_partial_ia', {id:surveyData['id']});// {client_id=surveyData['client_id'], id_type=surveyData['id_type']});
     return myAxios.put(url, surveyData);
@@ -57,6 +60,17 @@ export default {
     if (!( 'client_id'  in surveyData)){
       console.info("SurveyService: client id not in data");
       return undefined;
+    }
+    let captured_date = new Date();
+
+    surveyData['meta'] = {
+      "shard": getShardFromDate(captured_date),
+      "device": "to_be_implemented",
+      "survey_id": "to_be_implemented",
+      "validation_schema_id": "to_be_implemented",
+      "data_source": "ANSA",
+      "dt_captured": captured_date,      
+      "prev_partial_id": ""
     }
     console.log("add  survey data ------------------");
     console.log(surveyData);

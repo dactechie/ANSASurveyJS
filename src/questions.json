@@ -1,5 +1,6 @@
 {
   "title": "ANSA Initial Assessment",
+  "completedHtml": "Submitted ... PDC : {pdc}",
   "pages": [
    {
     "name": "LookupOptions",
@@ -58,7 +59,7 @@
        {
         "type": "expression",
         "text": "Invalid Value",
-        "expression": "isValidLookupIds({id_type}, {client_id})"       
+        "expression": "isValidLookupIds({id_type}, {client_id})"
        }
       ]
      }
@@ -188,68 +189,6 @@
     "title": "Team and Staff"
    },
    {
-    "name": "client_info",
-    "elements": [
-     {
-      "type": "matrixdropdown",
-      "name": "client_slk",
-      "title": "Client name",
-      "columns": [
-       {
-        "name": "Firstname",
-        "title": "First name",
-        "cellType": "text"
-       },
-       {
-        "name": "Surname",
-        "title": "Surname",
-        "cellType": "text"
-       },
-       {
-        "name": "Gender",
-        "title": "Gender",
-        "cellType": "dropdown"
-       }
-      ],
-      "columnLayout": "vertical",
-      "choices": [
-       {
-        "value": "m",
-        "text": "Male"
-       },
-       {
-        "value": "f",
-        "text": "Female"
-       },
-       {
-        "value": "o",
-        "text": "Other"
-       }
-      ],
-      "cellType": "text",
-      "rows": [
-       "rows_sex"
-      ]
-     },
-     {
-      "type": "panel",
-      "name": "panel2",
-      "elements": [
-       {
-        "type": "text",
-        "name": "birthDate",
-        "startWithNewLine": false,
-        "title": "Date of birth:",
-        "isRequired": true,
-        "inputType": "date"
-       }
-      ],
-      "questionTitleLocation": "left"
-     }
-    ],
-    "title": "Client Basic Information"
-   },
-   {
     "name": "main_substance_use",
     "elements": [
      {
@@ -374,47 +313,41 @@
        },
        {
         "type": "radiogroup",
-        "name": "odcx_method_of_use",
+        "name": "method_of_use",
         "indent": 3,
-        "requiredIf": "{odc[0].drug_type} notempty",
+        "requiredIf": "{panel.drug_type} notempty",
         "titleLocation": "hidden",
         "choices": [
          {
           "value": "ingests",
-          "text": "Ingests"
+          "text": "Ingests",
+          "visibleIf": "{panel.drug_type} = \"Alcohol\""
          },
          {
           "value": "injects",
-          "text": "Injects",
-          "visibleIf": "{odc[0].drug_type} = 'opioids'"
+          "text": "Injects"
          },
          {
           "value": "inhales",
-          "text": "Inhales",
-          "visibleIf": "{odc[0].drug_type} = 'amphetamines'"
-         },
-         {
-          "value": "transdermal",
-          "text": "Transdermal",
-          "visibleIf": "{odc[0].drug_type} = 'nicotine'"
+          "text": "Inhales"
          },
          {
           "value": "smokes",
-          "text": "Smokes",
-          "visibleIf": "{odc[0].drug_type} = 'nicotine'"
+          "text": "Smokes"
          },
          {
-          "value": "sublingual",
-          "text": "Sublingual",
-          "visibleIf": "{odc[0].drug_type} = 'nicotine'"
+          "value": "transdermal",
+          "text": "Transdermal"
          }
         ],
+        "choicesVisibleIf": "{panel.drug_type} notempty",
         "colCount": 3
        },
        {
         "type": "rating",
-        "name": "odcx_how_many_days",
-        "requiredIf": "{odc[0].drug_type} notempty",
+        "name": "how_many_days",
+        "visibleIf": "{panel.method_of_use} notempty",
+        "requiredIf": "{panel.drug_type} notempty",
         "rateMin": 0,
         "rateMax": 28,
         "rateStep": 2
@@ -441,7 +374,8 @@
       "templateElements": [
        {
         "type": "dropdown",
-        "name": "Drug Type",
+        "name": "drug_type",
+        "isRequired": true,
         "choices": [
          {
           "value": "alcohol",
@@ -469,34 +403,30 @@
         "type": "radiogroup",
         "name": "method_of_use",
         "visible": false,
+        "visibleIf": "{panel.drug_type} notempty",
         "indent": 3,
-        "requiredIf": "{aod_history[0].Drug Type} notempty",
+        "isRequired": true,
         "titleLocation": "hidden",
         "choices": [
          {
           "value": "ingests",
-          "text": "Ingests",
-          "visibleIf": "{pdc} = 'alcohol' or {pdc} = 'nicotine' and {pdc} = 'sedative'"
+          "text": "Ingests"
          },
          {
           "value": "injects",
-          "text": "Injects",
-          "visibleIf": "{pdc} = 'amphetamine' or {pdc} = 'opioid'"
+          "text": "Injects"
          },
          {
           "value": "inhales",
-          "text": "Inhales",
-          "visibleIf": "{pdc} = 'nicotine'"
+          "text": "Inhales"
          },
          {
           "value": "transdermal",
-          "text": "Transdermal",
-          "visibleIf": "{pdc} = 'nicotine'"
+          "text": "Transdermal"
          },
          {
-          "value": "sublingual",
-          "text": "Sublingual",
-          "visibleIf": "{pdc} = 'nicotine'"
+          "value": "smokes",
+          "text": "Smokes"
          }
         ],
         "colCount": 3
@@ -504,23 +434,35 @@
        {
         "type": "text",
         "name": "age_first_used",
-        "width": "30",
+        "visible": false,
+        "visibleIf": "{panel.drug_type} notempty",
+        "width": "15",
         "indent": 1,
         "title": "Age First Used",
-        "valueName": "5",
-        "defaultValue": 0,
+        "correctAnswer": 0,
+        "isRequired": true,
+        "validators": [
+         {
+          "type": "numeric",
+          "minValue": 1,
+          "maxValue": 100
+         }
+        ],
         "titleLocation": "left",
-        "inputType": "range",
-        "size": 90,
-        "maxLength": 90
+        "inputType": "number",
+        "size": 10,
+        "maxLength": 10,
+        "placeHolder": "0"
        },
        {
         "type": "radiogroup",
         "name": "how_often_used",
-        "indent": 3,
-        "title": "How Often",
-        "requiredIf": "{aod_history[0].Drug Type} notempty",
-        "titleLocation": "hidden",
+        "visible": false,
+        "visibleIf": "{panel.drug_type} notempty",
+        "indent": 1,
+        "title": "How often (period)",
+        "isRequired": true,
+        "titleLocation": "top",
         "choices": [
          {
           "value": "daily",
@@ -538,23 +480,106 @@
         "colCount": 4
        },
        {
-        "type": "text",
-        "name": "amount_used",
-        "width": "30",
-        "indent": 1,
-        "title": "Amount per period",
-        "valueName": "f5",
-        "defaultValue": 0,
-        "requiredIf": "{aod_history[0].Drug Type} notempty",
-        "titleLocation": "left",
-        "inputType": "range",
-        "size": 90,
-        "maxLength": 90
+        "type": "dropdown",
+        "name": "units_consumed_per_period",
+        "visible": false,
+        "visibleIf": "{panel.how_often_used} notempty",
+        "title": "Number of units consumed per period",
+        "isRequired": true,
+        "choices": [
+         {
+          "value": "<= 5",
+          "text": "<= 5"
+         },
+         {
+          "value": "5 - 9",
+          "text": "5 - 9"
+         },
+         {
+          "value": "10 - 14",
+          "text": "10 - 14"
+         },
+         {
+          "value": "15 - 19",
+          "text": "15 - 19"
+         },
+         {
+          "value": "20 - 29",
+          "text": "20 - 29"
+         },
+         {
+          "value": "30 - 39",
+          "text": "30 - 39"
+         },
+         {
+          "value": "40 - 49",
+          "text": "40 - 49"
+         },
+         {
+          "value": "50 - 59",
+          "text": "50 - 59"
+         },
+         {
+          "value": "60 - 69",
+          "text": "60 - 69"
+         },
+         {
+          "value": "70 - 79",
+          "text": "70 - 79"
+         },
+         {
+          "value": "80 - 89",
+          "text": "80 - 89"
+         },
+         {
+          "value": "90 - 99",
+          "text": "90 - 99"
+         },
+         {
+          "value": "> 100",
+          "text": "> 100"
+         }
+        ]
+       },
+       {
+        "type": "radiogroup",
+        "name": "usage_units",
+        "visible": false,
+        "visibleIf": "{panel.how_often_used} notempty",
+        "title": "Usage units",
+        "isRequired": true,
+        "choices": [
+         {
+          "value": "quart",
+          "text": "Quarts"
+         },
+         {
+          "value": "shots",
+          "text": "Shots"
+         },
+         {
+          "value": "bottles",
+          "text": "bottles"
+         },
+         {
+          "value": "pints",
+          "text": "Pints"
+         },
+         {
+          "value": "cigarettes",
+          "text": "Cigarettes"
+         },
+         {
+          "value": "packs",
+          "text": "Packs"
+         }
+        ],
+        "colCount": 3
        }
       ],
-      "panelCount": 0,
+      "panelCount": 1,
       "maxPanelCount": 5,
-      "panelsState": "firstExpanded",
+      "panelsState": "collapsed",
       "panelAddText": "Add Drug",
       "panelRemoveText": "Remove Drug",
       "showRangeInProgress": false,
@@ -568,8 +593,7 @@
      {
       "type": "checkbox",
       "name": "aod_harms_risks",
-      "title": "AOD Harms  / Risks",
-      "description": "In the last 4 weeks, have you experienced any of the following risks?",
+      "title": "In the last 4 weeks, have you experienced any of the following risks?",
       "hasOther": true,
       "choices": [
        {
@@ -589,14 +613,14 @@
         "text": "Violence / Assault"
        }
       ],
-      "otherText": "Other / Notes"
+      "otherText": "Other / Notes",
+      "colCount": 3
      },
      {
       "type": "rating",
       "name": "impctdaily",
-      "startWithNewLine": false,
-      "title": "# Impact on Daily Living",
-      "description": "During the last 4 weeks, how often has your substance use (or other addictive behaviour) impacted on your work or other daily living activities (like: social, recreational. study, caring for family)?",
+      "title": "During the last 4 weeks, how often has your substance use (or other addictive behaviour) impacted on your work or other daily living activities (like: social, recreational. study, caring for family)?",
+      "isRequired": true,
       "rateValues": [
        {
         "value": "0",
@@ -619,71 +643,55 @@
         "text": "Daily or almost daily"
        }
       ],
-      "rateMin": 3,
-      "rateMax": 4,
-      "minRateDescription": "Not at all",
-      "maxRateDescription": "Daily or almost daily"
+      "rateMin": "",
+      "rateMax": 1
      },
      {
-      "type": "matrixdropdown",
-      "name": "addctv",
-      "startWithNewLine": false,
-      "title": "Did you engage in any other addictive behaviours in the last 4 weeks?",
-      "columns": [
-       {
-        "name": "ndays",
-        "title": "Number of days",
-        "cellType": "text",
-        "width": "28",
-        "validators": [
-         {
-          "type": "numeric",
-          "minValue": 0,
-          "maxValue": 28
-         }
-        ],
-        "placeHolder": "0",
-        "inputType": "range"
-       }
-      ],
+      "type": "checkbox",
+      "name": "question1",
+      "title": "Addictive Behaviours",
+      "description": "Do you have any other addictive behaviours that are concerning you?",
+      "hasOther": true,
       "choices": [
        {
-        "value": 1,
-        "text": "dfg"
+        "value": "gambling",
+        "text": "Gambling"
        },
-       {
-        "value": 2,
-        "text": "555"
-       },
-       3,
-       {
-        "value": 4,
-        "text": "gg"
-       },
-       {
-        "value": 5,
-        "text": "ddgfd"
-       }
-      ],
-      "columnMinWidth": "28",
-      "rows": [
        {
         "value": "sex",
         "text": "Sex"
        },
        {
-        "value": "internet",
-        "text": "Internet"
+        "value": "hoarding",
+        "text": "Hoarding"
+       },
+       {
+        "value": "others",
+        "text": "Others"
        }
-      ]
+      ],
+      "otherText": "Other / Notes",
+      "colCount": 3
      }
     ],
     "title": "Impact of Substance Use"
+   },
+   {
+    "name": "summary_page",
+    "elements": [
+     {
+      "type": "html",
+      "name": "pre_final_summary",
+      "html": "consider injecting dynamic html into Syrvey JS via the VUE application.. loop over arrays etc.\n<table>\n  <tr>\n    <td>Key</td>\n    <td>Value</td>\n  </tr>\n  <tr>\n    <td>team_name</td>\n    <td>{team_name}</td>\n  </tr>  \n  <tr>\n    <td>pdc</td>\n    <td>{pdc}</td>\n  </tr>\n  <tr>\n    <td>pdc_method_of_use</td>\n    <td>{pdc_method_of_use}</td>\n  </tr>\n  <tr>\n    <td>odc</td>\n    <td>{odc[0].drug_type}</td>\n  </tr>\n  <tr>\n    <td>aod_history</td>\n    <td>{aod_history[0]}</td>\n  </tr>\n  <tr>\n    <td>aod_harms_risks</td>\n    <td>{aod_harms_risks[0]}</td>\n  </tr>\n  <tr>\n    <td>question1-Comment</td>\n    <td>{question1-Comment}</td>\n  </tr>\n  <tr>\n    <td>aod_harms_risks-Comment</td>\n    <td>{aod_harms_risks-Comment}</td>\n  </tr>\n</table>\n"
+     }
+    ],
+    "readOnly": true,
+    "title": "Summary",
+    "description": "Please review all data before submission.",
+    "navigationButtonsVisibility": "show"
    }
   ],
-  "showNavigationButtons": "none",
   "showTitle": false,
-  "showProgressBar": "bottom",
   "progressBarType": "questions",
   "goNextPageAutomatic": true,
   "questionTitleTemplate": "{title}"

@@ -1,0 +1,47 @@
+{
+  "name": "client_info",
+  "elements": [
+   {
+    "type": "text",
+    "name": "firstname",
+    "titleLocation": "hidden",
+    "placeHolder": "First name"
+   },
+   {
+    "type": "text",
+    "name": "surname",
+    "titleLocation": "hidden",
+    "placeHolder": "Last name"
+   },
+   {
+    "type": "radiogroup",
+    "name": "sex_new",
+    "indent": 2,
+    "titleLocation": "hidden",
+    "choices": [
+     {
+      "value": "male",
+      "text": "Male"
+     },
+     {
+      "value": "female",
+      "text": "Female"
+     },
+     {
+      "value": "other",
+      "text": "Other"
+     }
+    ],
+    "colCount": 3
+   },
+   {
+    "type": "text",
+    "name": "dob_new",
+    "width": "10",
+    "titleLocation": "hidden",
+    "inputType": "date",
+    "placeHolder": "1/1/2000"
+   }
+  ],
+  "title": "Client Basic Information"
+ }

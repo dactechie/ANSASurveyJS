@@ -1,0 +1,56 @@
+{
+  "survey": {
+    "survey": {
+      "team_name": "monaro",
+      "aod_history": [
+        {
+          "drug_type": "opioids",
+          "method_of_use": "injects",
+          "how_often_used": "monthly",
+          "age_first_used": 2,
+          "units_consumed_per_period": "10 - 14",
+          "usage_units": "bottles"
+        },
+        {
+          "drug_type": "alcohol",
+          "method_of_use": "ingests",
+          "age_first_used": 8,
+          "how_often_used": "weekly",
+          "usage_units": "shots",
+          "units_consumed_per_period": "60 - 69"
+        }
+      ],
+      "id_type": "MCARE_ID",
+      "client_id": "345",
+      "staff_name": "belinda",
+      "pdc": "amphetamine",
+      "pdc_method_of_use": "injects",
+      "odc": [
+        {
+          "drug_type": "nicotine",
+          "method_of_use": "inhales",
+          "how_many_days": "20"
+        },
+        {
+          "drug_type": "nicotine",
+          "method_of_use": "smokes",
+          "how_many_days": "28"
+        }
+      ],
+      "aod_harms_risks": [
+        "morethanonedrug",
+        "violence",
+        "other"
+      ],
+      "aod_harms_risks-Comment": "Notes for risks",
+      "impctdaily": "3",
+      "question1": [
+        "sex",
+        "other",
+        "others",
+        "gambling"
+      ],
+      "question1-Comment": "Notes for Addictive Beghaver"
+    }
+  }
+}
