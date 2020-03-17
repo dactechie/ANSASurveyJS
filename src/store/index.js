@@ -2,17 +2,16 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate';
 // https://github.com/robinvdvleuten/vuex-persistedstate
-//import client from './modules/client/'
+import client from './modules/client/'
 import survey from './modules/survey/'
 
 Vue.use(Vuex)
-
 
 //console.log("Going")
 export default new Vuex.Store({
     modules:{
       survey,
-      //client
+      client
     },
     // reducer: state => ({
     //   survey: survey.survey,
@@ -20,7 +19,7 @@ export default new Vuex.Store({
     plugins: [
       createPersistedState({
         key : 'mj-surveyjs',
-        paths: ['survey'],
+        //paths: ['surveys', 'clients'],
       })
     ]
 

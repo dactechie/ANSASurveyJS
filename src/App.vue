@@ -91,10 +91,10 @@ export default {
 
   methods: {
       ...mapActions([
-        'GET_LAST_SURVEY_BY_ID', 'GET_LAST_SURVEY_BY_SLKDEETS',
+        'GET_LAST_SURVEY_BY_ID', 'GET_LAST_SURVEY_BY_SLKDEETS', 'GET_LAST_SURVEYS_FOR_CLIENT',
         'UPDATE_SURVEY_DATASERVER', 'ADD_SURVEY_DATASERVER'
       ]),
-      ...mapGetters(['fullSurvey']),
+      ...mapGetters(['fullSurvey', 'getSurveysForClientSLK']),
 
       onSwipeHorizontal: function(event) { swipeEvent(this.survey, event) ;},
 
@@ -112,38 +112,61 @@ export default {
               return;
             }
             
-            let lkpdeets = setupLookup(survey, 
-                                {'by_id':this.GET_LAST_SURVEY_BY_ID, 
-                                'by_name': this.GET_LAST_SURVEY_BY_SLKDEETS });
-
+            let lkpdeets = setupLookup(survey);
+                //, 
+                  //              {'by_id':this.GET_LAST_SURVEY_BY_ID, 
+                    //            'by_name': this.GET_LAST_SURVEY_BY_SLKDEETS });
+            let lookedUpSLK='';
             try {      
               // delete survey.data['ClientLookupMethods'];
               console.log("CALLING ------ GET LAST SURVEY -0-------", lkpdeets);
-              let doLookup = lkpdeets['fn'];
+              // let doLookup = lkpdeets['fn'];
               
-              await doLookup(lkpdeets);
-              
-              let res = this.fullSurvey();
-              console.log("got full survey ", res);
-              //this.survey.data = res;
-              if (!res ) {
-                let err = lkpdeets['err'], err_key = lkpdeets['err_key'];
-                console.log(`Adding error ${err} to options [${err_key}]`) ;
-                options.errors[err_key] = err;
-              } 
 
-              // else if client exists but no survey was ever done.
-
-              else{ // partial survey 
-                  console.log(" nothing in survey. starting a new one \n\n");
-                  
-                //if there was no survey retrieved mark it as new addition to client's list of surveys
-                 this.survey['new_survey'] = true; // this will do a post rather than a PUT
-                 //what is the difference between this. and just survey ?
-                 survey['sendResultOnPageNext'] = true;
-                 survey.showNavigationButtons = true;
-                 survey.goNextPageAutomatic = false;
+              // let lookupres = await doLookup(lkpdeets); //updates state
+              await this.GET_LAST_SURVEYS_FOR_CLIENT(lkpdeets)
+              lookedUpSLK = sessionStorage.getItem('CurrentClientLookupID');
+              if (!lookedUpSLK){
+                                             
+              //  let err = lkpdeets['err'], err_key = lkpdeets['err_key'];
+              //  console.log(`Adding error ${err} to options [${err_key}]`) ;
+                options.errors['DB_ID'] = "Could not find client";
+                options.complete();
+                return;
               }
+              //let res = this.fullSurvey(); // gets survey from updated stated
+              let res = this.getSurveysForClientSLK(lookedUpSLK); // gets survey from updated stated
+              
+
+              let currentSurvey = JSON.parse(sessionStorage.getItem('CurrentSurvey'));
+              console.log("got full survey ", currentSurvey);
+              console.log("dlk ",lookedUpSLK);
+              console.log("dlkdssdddssfsdfsd ",currentSurvey[lookedUpSLK]);
+              //this.survey.data = res;
+              if (!currentSurvey ) {
+               // let err = lkpdeets['err'], err_key = lkpdeets['err_key'];
+               // console.log(`Unable to start session ... error ${err} to options [${err_key}]`) ;
+                options.errors['DB_ID'] = "Unable to start session";
+                options.complete();
+                return;
+              } 
+              this.survey.onServerValidateQuestions.remove(this.lookupClient);
+              // delete currentSurvey['_id'];
+              // delete currentSurvey['client_id'];
+              console.log(survey.data);
+              console.log(lookedUpSLK)
+              survey.data = currentSurvey[lookedUpSLK]
+
+              // else{ // partial survey 
+              //     console.log(" nothing in survey. starting a new one \n\n");
+                  
+              //   //if there was no survey retrieved mark it as new addition to client's list of surveys
+              //    this.survey['new_survey'] = true; // this will do a post rather than a PUT
+              //    //what is the difference between this. and just survey ?
+              //    survey['sendResultOnPageNext'] = true;
+              //    survey.showNavigationButtons = true;
+              //    survey.goNextPageAutomatic = false;
+              // }
               
               options.complete();
               // this.survey.data['clientDataReceived'] = true;
@@ -194,12 +217,12 @@ export default {
     model.onValueChanged.add((senderModel, options) => {
        console.log("value was changed sender model", senderModel);
        console.log("value was changed optiosn", options);
-      if (options.name === "ClientLookupMethods") { //me.survey.isFirstPage) { //
+      // if (options.name === "ClientLookupMethods") { //me.survey.isFirstPage) { //
   
-        console.log("going to skip saving because data has ClientLookupMethods", this.survey.data);
-        //delete this.survey.data['ClientLookupMethods'];
-        return;
-      }
+      //   console.log("going to skip saving because data has ClientLookupMethods", this.survey.data);
+      //   //delete this.survey.data['ClientLookupMethods'];
+      //   return;
+      // }
       // if restarting, survey, then clear store state
       // if ('client_lookup_id' == senderModel.currentPage.name) {
       //   console.log(JSON.stringify(me.survey.data));
@@ -220,6 +243,17 @@ export default {
       me.survey.goNextPageAutomatic = false;
       
       me.dirtyData = true;
+      if (Object.keys(model.data).length > 5) { //there is something to store besides the client name, id ( wcih is already known)
+        me.survey.sendResultOnPageNext = true;
+      }
+      // currentSurvey = JSON.parse(sessionStorage.getItem('CurrentSurvey'))
+      // // only if we are in session and somthing changed, is there somethign to send to the server
+      // if (me.survey.data['SLK'] === sessionStorage.getItem('CurrentClientLookupID') ||
+      //     me.survey.data['DB_ID'] === sessionStorage.getItem('CurrentSurvey')
+      //       ) {
+      //     me.survey.sendResultOnPageNext = true;  
+      // }
+      
     });
 
 /** onPartialSend

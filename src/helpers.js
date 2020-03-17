@@ -11,38 +11,43 @@ function checkAssign(objectToAssign, errors, data) {
   return 1;
 }
 
-function setupLookup(survey, getFunctions) {
+function setupLookup(survey){ //}, getFunctions) {
   let lookup_details = {}// , fn ='';
-  if (survey.data['client_id']) {
-    let client_id = survey.data['client_id'];
-    let id_type = survey.data['id_type'];
+  if (survey.data['DB_ID']) {
+    let client_id = survey.data['DB_ID'];
+    let id_type = survey.data['DB_ID_TYPE'];
     if (!client_id || !id_type) {
-      options.errors["client_id"] = "Missing Client ID/ ID Type";
+      options.errors["DB_ID"] = "Missing Client ID/ ID Type";
       options.complete();
       return undefined;
     }
     //fn = this.GET_LAST_SURVEY_BY_ID; 
-    lookup_details['fn'] =  getFunctions['by_id'];
-    lookup_details['client_id'] =  client_id;
-    lookup_details['id_type'] =  id_type;              
-    lookup_details['err'] = `'${client_id}' with type: '${id_type}' was not found.`;
-    lookup_details['err_key'] = 'client_id';
+   // lookup_details['fn'] =  getFunctions['by_id'];
+    lookup_details['DB_ID'] =  client_id;
+    lookup_details['DB_ID_TYPE'] =  id_type;              
+  //  lookup_details['err'] = `'${client_id}' with type: '${id_type}' was not found.`;
+   // lookup_details['err_key'] = 'DB_ID';
+    
+//    lookup_details['local_lookup_id'] = {client_id, id_type};
   } else {
       console.log(survey.data);
-      let keysToAdd = ['first_name', 'last_name', 'sex', 'DOB'];
+      //let keysToAdd = ['first_name', 'last_name', 'sex', 'DOB'];
       let result = checkAssign(lookup_details, options.errors,
-          { 'first_name': survey.data.Name, 'last_name': survey.data.Name,
-            'sex' : survey.data, 'DOB': survey.data }
+        //{Firstname: fname, Surname: lname, Sex: sex, DOB: DOB};  keys from the cosmos backen d
+          { 'Firstname': survey.data.first_name, 'Surname': survey.data.last_name,
+            'Sex' : survey.data.sex, 'DOB': survey.data.DOB }
       );
       if (!result) {
         console.log(" ERRORRRRRRRRRRRRRRRRR ", options.errors);
       }
-      lookup_details['fn'] = getFunctions['by_name'];
+     // lookup_details['fn'] = getFunctions['by_name'];
       //fn = this.GET_LAST_SURVEY_BY_SLKDEETS;
 
       console.log(lookup_details);
-      lookup_details['err'] = `'${lookup_details['first_name']}' ${lookup_details['last_name']} DOB: '${lookup_details['DOB']}' was not found.`;
-      lookup_details['err_key'] = 'first_name';
+    //  lookup_details['err'] = `'${lookup_details['Firstname']}' ${lookup_details['Surname']} DOB: '${lookup_details['DOB']}' was not found.`;
+   //   lookup_details['err_key'] = 'Firstname';
+
+     // lookup_details['local_lookup_id'] = 'JALALAF210719811';// TODO: calculate SLK
   }
 
   return lookup_details

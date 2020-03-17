@@ -31,7 +31,7 @@
     "elements": [
      {
       "type": "radiogroup",
-      "name": "id_type",
+      "name": "DB_ID_TYPE",
       "title": "ID Type",
       "isRequired": true,
       "choices": [
@@ -40,11 +40,11 @@
         "text": "SLK"
        },
        {
-        "value": "MCARE_ID",
+        "value": "MCARE",
         "text": "Mastercare"
        },
        {
-        "value": "CCARE_ID",
+        "value": "CCARE",
         "text": "Communicare"
        }
       ],
@@ -52,14 +52,14 @@
      },
      {
       "type": "text",
-      "name": "client_id",
+      "name": "DB_ID",
       "title": "Database ID",
       "isRequired": true,
       "validators": [
        {
         "type": "expression",
         "text": "Invalid Value",
-        "expression": "isValidLookupIds({id_type}, {client_id})"
+        "expression": "isValidLookupIds({DB_ID_TYPE}, {DB_ID})"
        }
       ]
      }
@@ -682,7 +682,7 @@
      {
       "type": "html",
       "name": "pre_final_summary",
-      "html": "consider injecting dynamic html into Syrvey JS via the VUE application.. loop over arrays etc.\n<table>\n  <tr>\n    <td>Key</td>\n    <td>Value</td>\n  </tr>\n  <tr>\n    <td>team_name</td>\n    <td>{team_name}</td>\n  </tr>  \n  <tr>\n    <td>pdc</td>\n    <td>{pdc}</td>\n  </tr>\n  <tr>\n    <td>pdc_method_of_use</td>\n    <td>{pdc_method_of_use}</td>\n  </tr>\n  <tr>\n    <td>odc</td>\n    <td>{odc[0].drug_type}</td>\n  </tr>\n  <tr>\n    <td>aod_history</td>\n    <td>{aod_history[0]}</td>\n  </tr>\n  <tr>\n    <td>aod_harms_risks</td>\n    <td>{aod_harms_risks[0]}</td>\n  </tr>\n  <tr>\n    <td>question1-Comment</td>\n    <td>{question1-Comment}</td>\n  </tr>\n  <tr>\n    <td>aod_harms_risks-Comment</td>\n    <td>{aod_harms_risks-Comment}</td>\n  </tr>\n</table>\n"
+      "html": "consider injecting dynamic html into Syrvey JS via the VUE application.. loop over arrays etc."
      }
     ],
     "readOnly": true,

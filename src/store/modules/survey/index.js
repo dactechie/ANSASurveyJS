@@ -4,7 +4,10 @@ import getters from './getters'
 
 export default {
     state: {
-       // survey: JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]')
+      'survey': []
+      //surveys: []
+      //survey : Vuex
+        //survey: JSON.parse(window.localStorage.getItem('mj-surveyjs')) || '[]')
     },
     getters,
     actions,

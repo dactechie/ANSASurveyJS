@@ -1,16 +1,7 @@
 
 import myAxios from './api';
-import {getShardFromDate} from './utils';
+import {getShardFromDate, buildURL} from './utils';
 
-function buildURL(request_type, params){
-  let pstring  = '';
-  for (let [key, value] of Object.entries(params)) {
-    pstring = `${pstring}&${key}=${value}`;
-  }
-  console.log("p string ", pstring);
-  return `${myAxios.defaults.baseURL}?request_type=${request_type}${pstring}`;
-  //return `${myAxios.defaults.baseURL}?request_type=${request_type}&client_id=${client_id}&id_type=${id_type}`;
-}
 
 export default {
 
@@ -20,10 +11,17 @@ export default {
   //     `${myAxios.defaults.baseURL}?request_type=get_partial_ia&client_id=${client_id}&id_type=${id_type}`);
   //   // return myAxios.get(`/survey_answers/${clientId}`);
   // },
-  getLastSurveyDataByID (client_id, id_type)  {
-    console.log(`get last (possibly partial) survey for client ${client_id}`);
-    let params = {client_id : client_id, id_type: id_type};
-    const url = buildURL('get_last_ia', params);
+  getLastSurveyDataByID (client_lookup, id_type)  {
+    console.log(`get last (possibly partial) survey for client ${client_lookup}`);
+    let params = {};
+    if (id_type === 'SLK')
+      params = {SLK: client_lookup}
+    else if (id_type)
+      params = {DB_ID : client_lookup, DB_TYPE: id_type};
+    else
+      params = client_lookup;// {Firstname: fname, Surname: lname, Sex: sex, DOB: DOB};
+
+    const url = buildURL(myAxios.defaults.baseURL,'get_client_records', params);
     return myAxios.get(url);
     // return myAxios.get(`/survey_answers/${clientId}`);
   },
@@ -31,8 +29,8 @@ export default {
     // },
   getLastSurveyDataBySLKDeets (fname, lname, sex, DOB)  {
     console.log(`get last (possibly partial) survey for client ${fname}`);
-    let params = {first_name : fname, last_name: lname, sex: sex, DOB: DOB};
-    const url = buildURL('get_last_ia_slkdeets', params);
+    let params = {Firstname: fname, Surname: lname, Sex: sex, DOB: DOB};
+    const url = buildURL(myAxios.defaults.baseURL,'get_client_records', params);
     return myAxios.get(url);
     // return myAxios.get(`/survey_answers/${clientId}`);
   },
@@ -50,7 +48,8 @@ export default {
     
     //surveyData['meta'][''] = new Date()
 
-    const url = buildURL('put_partial_ia', {id:surveyData['id']});// {client_id=surveyData['client_id'], id_type=surveyData['id_type']});
+    const url = buildURL(myAxios.defaults.baseURL,
+                      'put_partial_ia', {id:surveyData['_id']});// {client_id=surveyData['client_id'], id_type=surveyData['id_type']});
     return myAxios.put(url, surveyData);
     //return myAxios.put(`/partial/${clientId}`, surveyData);
   },

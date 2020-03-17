@@ -3,7 +3,6 @@
 import Velocity from "velocity-animate";
 
 function animate(animationType, duration) {
-  console.log("haha ");
   if (!duration)
       duration = 1000;
   let element = document.getElementById("app");
