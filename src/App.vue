@@ -1,8 +1,5 @@
 <template>
-<!--
-  ,
-         "expression": "lookupClient({client_id}, {id_type}) = true"
-  -->
+ 
   <div id="app" v-hammer:swipe.horizontal="onSwipeHorizontal">
     <button id="show-modal" @click="showModal = true">Status/Overview</button>
     <transition name="fade">
@@ -14,11 +11,11 @@
 
     <survey :survey="survey"></survey>
   </div>
-</template>
 
+</template>
 <script>
 import * as SurveyVue from "survey-vue";
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import surveyQuestions from  './questions.json';
 import SummaryModal from './SummaryModal';
 import drugs from './schema/drugs.json';  // TODO incorporate this into the dropdowns
@@ -57,6 +54,10 @@ SurveyVue
     .StylesManager
     .applyTheme("modern");
 
+SurveyVue
+    .FunctionFactory
+    .Instance
+    .register("isValidLookupIds", isValidLookupIds);
 
 
 // SurveyVue.FunctionFactory
@@ -71,30 +72,103 @@ SurveyVue
 // }
 
 export default {
+  
   name: "app",
+  
   components: {
     Survey,
     SummaryModal,
   },
+
   created() {
-        SurveyVue
-    .FunctionFactory
-    .Instance
-    .register("isValidLookupIds", isValidLookupIds);
+    
+    sessionStorage.clear();
+    this.survey.showNavigationButtons = false;
+    this.survey.goNextPageAutomatic = true;
+    this.survey.onServerValidateQuestions.add(this.lookupClient);
+
+    this.survey.onComplete.add(function(survey, options) {
+        console.log(JSON.stringify(survey.data));
+    });
+
+
+    let me = this;
+    
+    this.survey.onValueChanged.add((senderModel, options) => {
+      me.dirtyData = true;
+      if (Object.keys(me.survey.data).length > 5) { //there is something to store besides the client name, id ( wcih is already known)
+        me.survey.sendResultOnPageNext = true;
+      }
+    });
+
+/** onPartialSend
+ * Restore answered questions for in-completed Survey
+    Another common scenario, when you have a large survey and a user may not want to complete it during one session. 
+    Again, the solution is to restore the answered question and additionally the current page. 
+    If a survey is filled by login users, you may store the current answered results in your database. 
+    However, in the most scenarios, using a browser local storage works great as well, since in the most cases a user will comeback by using the same browser.
+    Below is the code that implements restoring answered questions and current page from local storage. 
+    We are setting the survey.sendResultOnPageNext property to true. As result, survey.onPartialSend event will be fired, to make our life easier.
+    */
+    this.survey.onPartialSend.add(function(model) {
+      
+      console.log("on partial send dirty ? " + me.dirtyData);
+      if (Object.keys(model.data).length > 5){ 
+                if (me.dirtyData) { //there is something to store besides the client name, id ( wcih is already known)
+                // if ('ClientLookupMethods' in model.data) {
+                //   console.log("onPartial send MODEL  ...", model);
+                //  // me.lookupClient(model, options);
+                //   //delete model.data['ClientLookupMethods'];
+                //   return;
+                // } 
+
+                // NEW SURVEY SAVE NOT IMPLEMTNEED YET 
+                console.log(model);
+             
+                if (me.isNewSurvey) { // get back the Survey-ID so we can PUT to it in the following pages
+                  console.log("\n\t >>>>>>>>>>>>>Going to add new survey >>>>>>>>>>>>>>>>>>>>>", model.data);
+                  me.ADD_SURVEY_DATASERVER(model.data);
+                  if (this.currentSurvey){
+                    me.isNewSurvey = false;
+                  }
+       
+                } else {
+                  console.log(" GOING TO UPPPDATE EXISTING ", model.data);
+                  me.UPDATE_SURVEY_DATASERVER(model.data);
+                }
+                me.dirtyData = false;
+
+              }
+          console.log(`updated >>>>>>>>survey Data ${Object.keys(model.data).length }`);
+          console.log(model.data);
+          console.log (`Current page ${model.currentPageNo}  . page count ${model.pageCount}`)
+          if (model.currentPageNo ===(model.pageCount -3)){
+            //console.log(h)                    
+            let page = model.getPage(model.currentPageNo+2)        
+            page.elements[0].html = generateSummaryHTML(model.data); 
+          }
+      }
+    });
+
   },
   mounted() {
     //this.survey.data = this.fullSurvey();
   
     setupAnimation(this.survey, this.doAnimation);
 
-  },
 
+  },
+  computed : {
+        currentSurvey: () =>{
+          return JSON.parse(sessionStorage.getItem('CurrentSurvey'));
+        }
+  },
   methods: {
       ...mapActions([
-        'GET_LAST_SURVEY_BY_ID', 'GET_LAST_SURVEY_BY_SLKDEETS', 'GET_LAST_SURVEYS_FOR_CLIENT',
+        'GET_LAST_SURVEYS_FOR_CLIENT',
         'UPDATE_SURVEY_DATASERVER', 'ADD_SURVEY_DATASERVER'
       ]),
-      ...mapGetters(['fullSurvey', 'getSurveysForClientSLK']),
+      ...mapGetters(['fullSurvey', 'getSurveysForCurrentClient']),
 
       onSwipeHorizontal: function(event) { swipeEvent(this.survey, event) ;},
 
@@ -102,8 +176,8 @@ export default {
       lookupClient: async function (survey, options) {
             //options.data contains the data for the current page.
             // if (! survey.isFirstPage){
-            console.log("lookupClient: SURVEYons::::::", survey);
-            console.log("options::::::", options);
+            // console.log("lookupClient: SURVEYons::::::", survey);
+            // console.log("options::::::", options);
             if (survey.currentPageNo != 1 ) {
            // if( survey.data.team_staff || // beyond page 2
             //    ((! survey.isFirstPage) && ! ('ClientLookupMethods' in survey.data)) ||
@@ -113,49 +187,51 @@ export default {
             }
             
             let lkpdeets = setupLookup(survey);
-                //, 
-                  //              {'by_id':this.GET_LAST_SURVEY_BY_ID, 
-                    //            'by_name': this.GET_LAST_SURVEY_BY_SLKDEETS });
-            let lookedUpSLK='';
+            if (!lkpdeets){
+                options.errors['DB_ID'] = "Could not setup lookiu";
+                options.complete();
+                return;         
+            }
+  
             try {      
               // delete survey.data['ClientLookupMethods'];
               console.log("CALLING ------ GET LAST SURVEY -0-------", lkpdeets);
-              // let doLookup = lkpdeets['fn'];
               
-
-              // let lookupres = await doLookup(lkpdeets); //updates state
-              await this.GET_LAST_SURVEYS_FOR_CLIENT(lkpdeets)
-              lookedUpSLK = sessionStorage.getItem('CurrentClientLookupID');
-              if (!lookedUpSLK){
-                                             
-              //  let err = lkpdeets['err'], err_key = lkpdeets['err_key'];
-              //  console.log(`Adding error ${err} to options [${err_key}]`) ;
-                options.errors['DB_ID'] = "Could not find client";
-                options.complete();
-                return;
-              }
-              //let res = this.fullSurvey(); // gets survey from updated stated
-              let res = this.getSurveysForClientSLK(lookedUpSLK); // gets survey from updated stated
+              await this.GET_LAST_SURVEYS_FOR_CLIENT(lkpdeets) // side effect - sets the  local and session storage
               
-
-              let currentSurvey = JSON.parse(sessionStorage.getItem('CurrentSurvey'));
-              console.log("got full survey ", currentSurvey);
-              console.log("dlk ",lookedUpSLK);
-              console.log("dlkdssdddssfsdfsd ",currentSurvey[lookedUpSLK]);
-              //this.survey.data = res;
-              if (!currentSurvey ) {
-               // let err = lkpdeets['err'], err_key = lkpdeets['err_key'];
-               // console.log(`Unable to start session ... error ${err} to options [${err_key}]`) ;
-                options.errors['DB_ID'] = "Unable to start session";
-                options.complete();
-                return;
-              } 
+              // // console.log(`Available error keys `, options.errors);
+              // let clientSurveys = this.getSurveysForCurrentClient(); // gets survey from updated stated
+            
+              // // let currentSurvey = JSON.parse(sessionStorage.getItem('CurrentSurvey'));
+              // // console.log("got full survey ", currentSurvey);
+              // // console.log("dlk ",lookedUpSLK);
+              // // console.log("dlkdssdddssfsdfsd ",currentSurvey[lookedUpSLK]);
+              // //this.survey.data = res;
+              // if (!clientSurveys ) {
+              //  // let err = lkpdeets['err'], err_key = lkpdeets['err_key'];
+              //  // console.log(`Unable to start session ... error ${err} to options [${err_key}]`) ;
+              //   options.errors['DB_ID'] = "Unable to start session";
+              //   options.complete();
+              //   return;
+              // } 
               this.survey.onServerValidateQuestions.remove(this.lookupClient);
               // delete currentSurvey['_id'];
               // delete currentSurvey['client_id'];
-              console.log(survey.data);
-              console.log(lookedUpSLK)
-              survey.data = currentSurvey[lookedUpSLK]
+
+              //let currentSurvey = sessionStorage.getItem('CurrentSurvey');
+              
+              if ( this.currentSurvey) { // do the prefill
+                survey.data = this.currentSurvey;
+                console.log("lookupClient: current survet data ", survey.data);
+              } else {
+                 this.isNewSurvey = true;
+              }
+               
+               this.survey.showNavigationButtons = true;
+               this.survey.goNextPageAutomatic = false;
+              
+              //                               // WARNING .. does persisted state write this to localstorage and override the list of all surveys with this one survey ? 
+              // survey.data = clientSurveys[0] ; // WARNING .. does persisted state write this to localstorage and override the list of all surveys with this one survey ? 
 
               // else{ // partial survey 
               //     console.log(" nothing in survey. starting a new one \n\n");
@@ -190,116 +266,14 @@ export default {
  *    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<
  *        *  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------
  */
+
   data() {
-    let dirtyData = false;
-    let json = surveyQuestions;
-    
-    //json = setOfficialPDC(json);
-    let me = this;
-    var model = new SurveyVue.Model(surveyQuestions);
-
-    model.onServerValidateQuestions.add(this.lookupClient);
-    // model.onCurrentPageChanging.add((senderModel, options)=>{
-    //          console.log("onCurrentPageChanging sender model", senderModel);
-    //    console.log("onCurrentPageChanging optiosn", options);
-    //   //  if (options.newCurrentPage.name == 'client_lookup_id' &&
-    //   //     options.oldCurrentPage.name != 'LookupOptions') {
-    //   //       // hit the back button and could potentially change
-    //   //       console.log("ADDDDDDDDDDDDDD LOGGGICCCC..delete store data");
-    //   //     }
-    // })
-
-    model.onComplete.add(function(survey, options) {
-      
-        console.log(JSON.stringify(survey.data));
-    });
-    //model.onFirstPageIsStartedChanged
-    model.onValueChanged.add((senderModel, options) => {
-       console.log("value was changed sender model", senderModel);
-       console.log("value was changed optiosn", options);
-      // if (options.name === "ClientLookupMethods") { //me.survey.isFirstPage) { //
-  
-      //   console.log("going to skip saving because data has ClientLookupMethods", this.survey.data);
-      //   //delete this.survey.data['ClientLookupMethods'];
-      //   return;
-      // }
-      // if restarting, survey, then clear store state
-      // if ('client_lookup_id' == senderModel.currentPage.name) {
-      //   console.log(JSON.stringify(me.survey.data));
-      //   let temp = JSON.parse(JSON.stringify(me.survey.data))
-      //   me.survey.data = {};
-      //   if ('id_type' in temp){
-      //       me.survey.data['id_type'] = temp['id_type']
-      //   }
-      //   if ('client_id' in temp){
-      //       me.survey.data['client_id'] = temp['client_id']
-      //   }
-      //   if ('ClientLookupMethods' in temp){
-      //       me.survey.data['client_id'] = temp['ClientLookupMethods']
-      //   }
-    
-      // }
-      me.survey.showNavigationButtons = true;
-      me.survey.goNextPageAutomatic = false;
-      
-      me.dirtyData = true;
-      if (Object.keys(model.data).length > 5) { //there is something to store besides the client name, id ( wcih is already known)
-        me.survey.sendResultOnPageNext = true;
-      }
-      // currentSurvey = JSON.parse(sessionStorage.getItem('CurrentSurvey'))
-      // // only if we are in session and somthing changed, is there somethign to send to the server
-      // if (me.survey.data['SLK'] === sessionStorage.getItem('CurrentClientLookupID') ||
-      //     me.survey.data['DB_ID'] === sessionStorage.getItem('CurrentSurvey')
-      //       ) {
-      //     me.survey.sendResultOnPageNext = true;  
-      // }
-      
-    });
-
-/** onPartialSend
- * Restore answered questions for in-completed Survey
-    Another common scenario, when you have a large survey and a user may not want to complete it during one session. 
-    Again, the solution is to restore the answered question and additionally the current page. 
-    If a survey is filled by login users, you may store the current answered results in your database. 
-    However, in the most scenarios, using a browser local storage works great as well, since in the most cases a user will comeback by using the same browser.
-    Below is the code that implements restoring answered questions and current page from local storage. 
-    We are setting the survey.sendResultOnPageNext property to true. As result, survey.onPartialSend event will be fired, to make our life easier.
-    */
-    model.onPartialSend.add(function(model) {
-      console.log("on partial send dirty ? " + me.dirtyData);
-      if (me.dirtyData && 
-        Object.keys(model.data).length > 5) { //there is something to store besides the client name, id ( wcih is already known)
-        // if ('ClientLookupMethods' in model.data) {
-        //   console.log("onPartial send MODEL  ...", model);
-        //  // me.lookupClient(model, options);
-        //   //delete model.data['ClientLookupMethods'];
-        //   return;
-        // } 
-        if (model.hasOwnProperty('new_survey')) { // get back the Survey-ID so we can PUT to it in the following pages
-        console.log("Going to add new survey");
-          me.ADD_SURVEY_DATASERVER(model.data);
-          // only this once. it is no longer new.
-          delete model['new_survey'];
-        } else {
-          console.log(" GOING TO UPPPDATE EXISTING ");
-          me.UPDATE_SURVEY_DATASERVER(model.data);
-        }
-        me.dirtyData = false;
-        console.log(`updated >>>>>>>>survey Data ${Object.keys(model.data).length }`);
-        console.log(model.data);
-        console.log (`Current page ${model.currentPageNo}  . page count ${model.pageCount}`)
-        if (model.currentPageNo ===(model.pageCount -3)){                    
-          let page = model.getPage(model.currentPageNo+2)          
-          page.elements[0].html = generateSummaryHTML(model.data);          
-        }
-      }
-    });
-
-    return {
+   return {
       showModal: false,
-      survey: model,
+      survey: new SurveyVue.Model(surveyQuestions),
       doAnimation:false,
-      dirtyData: false
+      dirtyData: false,
+      isNewSurvey: false
     };
    }
 };
@@ -347,3 +321,39 @@ export default {
       //   console.log("PDC: " + pdc)
       //   this.survey.setValue('pdcmthd', {'pdcdeets': {'PDC': pdc.toLowerCase()}})
       // }
+
+
+
+  //onValueChanged.add : 
+             //console.log("value was changed sender model", senderModel);
+            //console.log("value was changed optiosn", options);
+
+            // if (options.name === "ClientLookupMethods") { //me.survey.isFirstPage) { //
+        
+            //   console.log("going to skip saving because data has ClientLookupMethods", this.survey.data);
+            //   //delete this.survey.data['ClientLookupMethods'];
+            //   return;
+            // }
+            // if restarting, survey, then clear store state
+            // if ('client_lookup_id' == senderModel.currentPage.name) {
+            //   console.log(JSON.stringify(me.survey.data));
+            //   let temp = JSON.parse(JSON.stringify(me.survey.data))
+            //   me.survey.data = {};
+            //   if ('id_type' in temp){
+            //       me.survey.data['id_type'] = temp['id_type']
+            //   }
+            //   if ('client_id' in temp){
+            //       me.survey.data['client_id'] = temp['client_id']
+            //   }
+            //   if ('ClientLookupMethods' in temp){
+            //       me.survey.data['client_id'] = temp['ClientLookupMethods']
+            //   }
+          
+            // }
+                  // currentSurvey = JSON.parse(sessionStorage.getItem('CurrentSurvey'))
+            // // only if we are in session and somthing changed, is there somethign to send to the server
+            // if (me.survey.data['SLK'] === sessionStorage.getItem('CurrentClientLookupID') ||
+            //     me.survey.data['DB_ID'] === sessionStorage.getItem('CurrentSurvey')
+            //       ) {
+            //     me.survey.sendResultOnPageNext = true;  
+            // }

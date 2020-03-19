@@ -4,8 +4,8 @@ import getters from './getters'
 
 export default {
     state: {
-      'survey': []
-      //surveys: []
+      //'survey': {}
+      survey: {}
       //survey : Vuex
         //survey: JSON.parse(window.localStorage.getItem('mj-surveyjs')) || '[]')
     },

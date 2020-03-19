@@ -12,12 +12,12 @@ export default {
   //   // return myAxios.get(`/survey_answers/${clientId}`);
   // },
   getLastSurveyDataByID (client_lookup, id_type)  {
-    console.log(`get last (possibly partial) survey for client ${client_lookup}`);
+    console.log(`SurveyService: getLastSurveyDataByID  (possibly partial)`, client_lookup);
     let params = {};
     if (id_type === 'SLK')
       params = {SLK: client_lookup}
-    else if (id_type)
-      params = {DB_ID : client_lookup, DB_TYPE: id_type};
+    // else if (id_type)
+    //   params = {DB_ID : client_lookup, DB_TYPE: id_type};
     else
       params = client_lookup;// {Firstname: fname, Surname: lname, Sex: sex, DOB: DOB};
 
@@ -26,14 +26,14 @@ export default {
     // return myAxios.get(`/survey_answers/${clientId}`);
   },
 
-    // },
-  getLastSurveyDataBySLKDeets (fname, lname, sex, DOB)  {
-    console.log(`get last (possibly partial) survey for client ${fname}`);
-    let params = {Firstname: fname, Surname: lname, Sex: sex, DOB: DOB};
-    const url = buildURL(myAxios.defaults.baseURL,'get_client_records', params);
-    return myAxios.get(url);
-    // return myAxios.get(`/survey_answers/${clientId}`);
-  },
+  //   // },
+  // getLastSurveyDataBySLKDeets (fname, lname, sex, DOB)  {
+  //   console.log(`get last (possibly partial) survey for client ${fname}`);
+  //   let params = {Firstname: fname, Surname: lname, Sex: sex, DOB: DOB};
+  //   const url = buildURL(myAxios.defaults.baseURL,'get_client_records', params);
+  //   return myAxios.get(url);
+  //   // return myAxios.get(`/survey_answers/${clientId}`);
+  // },
 
 
 
@@ -43,13 +43,13 @@ export default {
       console.info("SurveyService: client id not in data");
       return undefined;
     }
-    console.log("savePartialSurvey survey data ------------------");
+    
     console.log(surveyData);
     
-    //surveyData['meta'][''] = new Date()
-
+    surveyData['meta']['last_modified'] = new Date();
+    console.log("savePartialSurvey survey data ------------------", surveyData['meta']['last_modified'] );
     const url = buildURL(myAxios.defaults.baseURL,
-                      'put_partial_ia', {id:surveyData['_id']});// {client_id=surveyData['client_id'], id_type=surveyData['id_type']});
+                      'put_partial_ia');//, {_id:surveyData['_id']});
     return myAxios.put(url, surveyData);
     //return myAxios.put(`/partial/${clientId}`, surveyData);
   },
@@ -68,14 +68,15 @@ export default {
       "survey_id": "to_be_implemented",
       "validation_schema_id": "to_be_implemented",
       "data_source": "ANSA",
-      "dt_captured": captured_date,      
+      "dt_first_captured": captured_date,
+      "last_modified": captured_date,
       "prev_partial_id": ""
     }
     console.log("add  survey data ------------------");
     console.log(surveyData);
 
-    const url = buildURL('post_partial_ia');
-    return myAxios.post(url, surveyData);
+    const url = buildURL(myAxios.defaults.baseURL,'post_partial_ia');
+    return myAxios.post(url,surveyData);
     //return myAxios.put(`/partial/${clientId}`, surveyData);
   }
 

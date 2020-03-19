@@ -14,7 +14,8 @@ export default new Vuex.Store({
       client
     },
     // reducer: state => ({
-    //   survey: survey.survey,
+    //   survey: state.survey,
+    //   client: state.client,
     // }),
     plugins: [
       createPersistedState({

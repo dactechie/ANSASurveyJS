@@ -4,7 +4,7 @@ import  {mutations} from './mutations'
 
 export default {
     state: {
-      'client': []      
+      client: {}
     //     clients: JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]'),
     //     allContents: [],
     },
