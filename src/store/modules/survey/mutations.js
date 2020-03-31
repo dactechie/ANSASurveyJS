@@ -1,4 +1,6 @@
-import { addOrReplaceOrIgnoreIfMoreRecent } from '@/common/utils';
+import { //addOrReplaceOrIgnoreIfMoreRecent,
+   clientHasSurveys, createNewLocalSurvey, getMatchingContinuableLocalSurveyIndex, isLocalNewerVersion,
+   getContinuableLocalSurveyIndex   } from '@/common/utils';
 
 // export const STORAGE_KEY = 'survey-vuejs'
 
@@ -15,18 +17,157 @@ export const mutations = {
     //question.columns[0].choices = drugs['enum'];
 
   },
-  updateSurveyFormDataFromBackendUpdate(state, surveyData) {
-    //let currentSurvey = JSON.parse( sessionStorage.getItem('CurrentSurvey'));
-    console.warn('in here : updateSurveyFormDataFromBackendUpdate');
-    let clientSLK = sessionStorage.getItem('CurrentClientLookupID')
-    //state.survey
-    surveyData['meta']['device'] ='UPDATETTEDDDD';
-    addOrReplaceOrIgnoreIfMoreRecent(state['survey'], clientSLK, surveyData);
+  offlineStartSessionByLocalLookup: (state, client_lookup) => {
+    //unable to fetch data from backend.
 
-    sessionStorage.setItem('CurrentSurvey', JSON.stringify(surveyData));
+    //if localstore has a version of the backend client and survey object, we should allow them to continue.
+    // continue:
+    //  use the localstore unfinished survey, provided the survey is not past the expiry date.
+    //    otherwise sstart a new survey
+    
+    // start the session with client data: 
+    let clientSLK = sessionStorage.getItem('CurrentClientLookupID');
+    if (!clientSLK) {
+      clientSLK = client_lookup['SLK'];
+      if (!clientSLK) {
+        console.error("Giving up - no SLK. Can't continue with offlineStartSessionByLocalLookup !!");
+        return;
+      }
+      console.log("starting an offline session")
+      sessionStorage.setItem('CurrentClientLookupID', clientSLK);
+    }
+    //find latest unfinished , non-exired survey
+    const listofSurveysForClient = state['survey'][clientSLK];//state sync'd from localStorage
+  
+    if(! clientHasSurveys(listofSurveysForClient)) {
+      console.log(`offlineStartSessionByLocalLookup: no previous surveys for client ${clientSLK}`);
+      return;
+    }
+    const freshLocalPartialSrvyIdx = 
+              getContinuableLocalSurveyIndex(listofSurveysForClient);
+    if (freshLocalPartialSrvyIdx < 0 ) {
+      console.log(`offlineStartSessionByLocalLookup: No usable survey feed the session with. \
+                            brand new session for client ${clientSLK}`);
+      return;
+    }
+    
+    //careful : when it goes back onlien, there is no link between survet.client_id 
+      // so the first update to the server will be "add-New-Surbey-For-Client(client ['_id']) "
+    sessionStorage.setItem('CurrentSurvey',
+                           listofSurveysForClient[freshLocalPartialSrvyIdx]);
+
+
+    //localstore is sync'd to state by vuex-persisted
+    // but how did the vuex-state get updated in the offlfine mode 
+    //      from SurveyJS: survey.data ?
+    
+    
+    // session store needs updating
+    // if CurrentClient is not set, calculate SLK and set it
+
+    // if CurrentSession is not set, use the SLK from CurrentClient and set it to the most recent
+    //  INCOMPLETE survey for this client, (if one is available)
+
 
   },
-  updateSurveyFormData (state, surveyData) {
+
+/**
+ *       // inaddition to setting the current client and survey session variables
+        // if the client/clients' surveys was/were not in the local storage, it adds them
+        // if the client WAS in the local storage, it is possible then smarr-merge the surveys
+        // smart-merge : there moght have been a prior session where the partial updates to the survey had no chance to reach the server/
+        // if the 'capture-date' on the localstore-survey is newer than any of the surveys' 'last-modified-date' returned from the backend, then ask the client
+        // do they want to continue editing the draft or discard and start over.
+
+        //  states :
+        // 1. last_captured (frontend) > last-modfiied (backend) (or missing last-mod date) => didn't sync new changes to backend
+        // 2. last-modified > last_captured : admin edited outside the survey -app
+ * @param {*} state 
+ * @param {*} backendSurveyData  : [db_id, response.data)]
+ */
+  updateSurveyStateFromBackendData(state, serverResponseData) {
+    const backendClientData = serverResponseData.client;
+    let backendSurveyData= serverResponseData.survey ;
+
+    let clientSLK = '';
+    if (! backendClientData) {
+      clientSLK =  sessionStorage.getItem('CurrentClientLookupID')
+      backendSurveyData = serverResponseData;
+    }
+    else // if just started the survey session, this would be empty..so set it from the bkend-returned data
+      clientSLK = backendClientData['SLK'];
+
+    // if (sessionStoageSLK !== clientSLK){
+    console.log('in here : fetchedUpdateCurrentSurvey. backend-survey: ', backendSurveyData);    
+                            //  // //  // //  // //  // 
+                            //  start the session
+                            //  // //  // //  // //  //     
+    if(!backendSurveyData) {      
+      console.warn("Please add this survey to the backend with the next page.. (NOT IMPLEMENTED) ");      
+      return;
+    }
+    const localClientSurveys = state['survey'][clientSLK];
+    console.log ("updateSurveyStateFromBackendData: listofSurveysForClient -> ", localClientSurveys);
+    if(! clientHasSurveys(localClientSurveys)) { 
+      //createNewLocalSurvey(state['survey'][clientSLK], backendSurveyData);
+      if (!state['survey'][clientSLK]) 
+        state['survey'][clientSLK] = []
+      state['survey'][clientSLK].push(backendSurveyData);
+
+      sessionStorage.setItem('CurrentSurvey', JSON.stringify(backendSurveyData));
+      console.log("First LocalSurvey Added. session started : CurrentSurvey. localstore: ",
+                     state['survey'][clientSLK]);
+      return;
+    }
+    //  //  local-client has one or more surveys // //
+    const mtchngLocalSrvyIdx = getMatchingContinuableLocalSurveyIndex(
+                                  localClientSurveys, backendSurveyData);
+    if (mtchngLocalSrvyIdx <  0) { // none of the locally stored surveys match whats coming from DB.
+      //createNewLocalSurvey(state['survey'][clientSLK], backendSurveyData);
+      state['survey'][clientSLK].push(backendSurveyData);
+      sessionStorage.setItem('CurrentSurvey', JSON.stringify(backendSurveyData));
+      console.log("added backendSurvey to the localstore.")
+      return;
+    }
+    const localSurvey = localClientSurveys[mtchngLocalSrvyIdx];
+    const isLocalNewer = isLocalNewerVersion(
+                                  localSurvey,
+                                  backendSurveyData);
+    if (isLocalNewer === undefined) {
+      console.error(" session not set. TODO: raise an event.");    // raise an event that requests the user 
+      return;                                                      // to resolve the conflict.      
+    }
+    let currentSurvey = backendSurveyData;
+    if(isLocalNewer)
+      currentSurvey = localSurvey;        
+    else
+      state['survey'][clientSLK][mtchngLocalSrvyIdx] = backendSurveyData;
+      
+    sessionStorage.setItem('CurrentSurvey', JSON.stringify(currentSurvey));
+    return;    
+  },
+
+
+
+
+  // updateSurveyFormDataFromBackendUpdate(state, surveyData) {
+  //   //let currentSurvey = JSON.parse( sessionStorage.getItem('CurrentSurvey'));
+  //   console.warn('in here : updateSurveyFormDataFromBackendUpdate');
+  //   let clientSLK = sessionStorage.getItem('CurrentClientLookupID')
+  //   //state.survey
+  //   //surveyData['meta']['device'] ='UPDATETTEDDDD';
+  //   addOrReplaceOrIgnoreIfMoreRecent(state['survey'], clientSLK, surveyData);
+
+  //   sessionStorage.setItem('CurrentSurvey', JSON.stringify(surveyData));
+
+  // },
+
+  /**
+   * Called after backedn call to getClient Surveys
+   * @param {*} state 
+   * @param {*} surveyData 
+   */
+/*  updateSurveyFormData (state, surveyData) {
       // console.log("state", state)
       console.log("updateSurvey_Form_Data::", surveyData)
       if (surveyData === undefined) {
@@ -36,10 +177,10 @@ export const mutations = {
         //Object.assign(state, undefined);
       }
       else {
-        if ('ClientLookupMethods' in surveyData  ) {
-          console.warn("Mutation: updateSurveyFormData  -> Deleting ClientLookupMethods")
-          delete surveyData.ClientLookupMethods;
-        }
+        // if ('ClientLookupMethods' in surveyData  ) {
+        //   console.warn("Mutation: updateSurveyFormData  -> Deleting ClientLookupMethods")
+        //   delete surveyData.ClientLookupMethods;
+        // }
         console.log("updateSurveyFormData: surveyData ->  ", surveyData);
         
         let client_slk = '', survey ={} ; // Ugghj..ugly hack..
@@ -48,7 +189,9 @@ export const mutations = {
           // Vueclient does not know how to generate the SLK.. we only do it in the server
           // 'Adds /Insertst into server do not respond with an SLK..maybe they should ?
           client_slk = sessionStorage.getItem('CurrentClientLookupID');
-          survey= surveyData;
+          state['survey'][client_slk].push(surveyData)
+          sessionStorage.setItem('CurrentSurvey', surveyData);
+          return;
         }
         else { // this is a lookup-all-client-records response;
           client_slk = surveyData['client']['SLK'];
@@ -73,6 +216,6 @@ export const mutations = {
         sessionStorage.setItem('CurrentSurvey', JSON.stringify(mostRecentSurvey));
       }
       //state.survey = surveyData
-  }
+  }*/
 
 }

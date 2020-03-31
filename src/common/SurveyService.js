@@ -1,6 +1,6 @@
 
 import myAxios from './api';
-import {getShardFromDate, buildURL} from './utils';
+import {getMeta, buildURL} from './utils';
 
 
 export default {
@@ -11,7 +11,7 @@ export default {
   //     `${myAxios.defaults.baseURL}?request_type=get_partial_ia&client_id=${client_id}&id_type=${id_type}`);
   //   // return myAxios.get(`/survey_answers/${clientId}`);
   // },
-  getLastSurveyDataByID (client_lookup, id_type)  {
+  getLastSurveyData(client_lookup, id_type)  {
     console.log(`SurveyService: getLastSurveyDataByID  (possibly partial)`, client_lookup);
     let params = {};
     if (id_type === 'SLK')
@@ -43,11 +43,9 @@ export default {
       console.info("SurveyService: client id not in data");
       return undefined;
     }
+    surveyData['meta']['last_captured'] = new Date();
     
-    console.log(surveyData);
-    
-    surveyData['meta']['last_modified'] = new Date();
-    console.log("savePartialSurvey survey data ------------------", surveyData['meta']['last_modified'] );
+    console.log("savePartialSurvey survey data -------", surveyData);
     const url = buildURL(myAxios.defaults.baseURL,
                       'put_partial_ia');//, {_id:surveyData['_id']});
     return myAxios.put(url, surveyData);
@@ -60,18 +58,9 @@ export default {
       console.info("SurveyService: client id not in data");
       return undefined;
     }
-    let captured_date = new Date();
+    
+    surveyData['meta'] = getMeta(surveyData, {"last_captured": new Date()});
 
-    surveyData['meta'] = {
-      "shard": getShardFromDate(captured_date),
-      "device": "to_be_implemented",
-      "survey_id": "to_be_implemented",
-      "validation_schema_id": "to_be_implemented",
-      "data_source": "ANSA",
-      "dt_first_captured": captured_date,
-      "last_modified": captured_date,
-      "prev_partial_id": ""
-    }
     console.log("add  survey data ------------------");
     console.log(surveyData);
 
@@ -80,47 +69,4 @@ export default {
     //return myAxios.put(`/partial/${clientId}`, surveyData);
   }
 
-
 } 
-
-// {
-//   "name": "client_lookup",
-//   "elements": [
-//     {
-//     "type": "text",
-//     "name": "client_id",
-//     "title": "ID  - SLK / Database ID"
-//     },
-//     {
-//     "type": "radiogroup",
-//     "name": "id_type",
-//     "title": "ID Type",
-//     "validators": [
-//       {
-//        "type": "expression"
-//       },
-//       {
-//        "type": "expression",
-//        "text": "Did not find client"
-       
-//       }
-//     ],
-//     "choices": [
-//       {
-//       "value": "SLK",
-//       "text": "SLK"
-//       },
-//       {
-//       "value": "MCARE_ID",
-//       "text": "MCARE_ID"
-//       },
-//       {
-//       "value": "CCARE_ID",
-//       "text": "CCARE_ID"
-//       }
-//     ],
-//     "colCount": 3
-//     }
-//   ],
-//   "title": "Client Search"
-//   },

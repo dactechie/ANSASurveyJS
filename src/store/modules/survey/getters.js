@@ -15,7 +15,7 @@ const getters = {
       if (!currentClient || 
           ! Object.keys(state.survey).includes(currentClient['SLK'])) {
 
-            console.warn(`cleint not in localstore`);
+            console.warn(`cleint / survey not in localstore`);
             return undefined;
       }
 
