@@ -1,6 +1,7 @@
 
-import myAxios from './api';
+import httpLib from './api';
 import {getMeta, buildURL} from './utils';
+import {getClientAssessments} from '@/utils/db/TableStoreService.js';
 
 
 export default {
@@ -11,19 +12,9 @@ export default {
   //     `${myAxios.defaults.baseURL}?request_type=get_partial_ia&client_id=${client_id}&id_type=${id_type}`);
   //   // return myAxios.get(`/survey_answers/${clientId}`);
   // },
-  getLastSurveyData(client_lookup, id_type)  {
-    console.log(`SurveyService: getLastSurveyDataByID  (possibly partial)`, client_lookup);
-    let params = {};
-    if (id_type === 'SLK')
-      params = {SLK: client_lookup}
-    // else if (id_type)
-    //   params = {DB_ID : client_lookup, DB_TYPE: id_type};
-    else
-      params = client_lookup;// {Firstname: fname, Surname: lname, Sex: sex, DOB: DOB};
+  getLastSurveyData(client_lookup)  {
+      return getClientAssessments(client_lookup['ClientID'], client_lookup['IDType'])
 
-    const url = buildURL(myAxios.defaults.baseURL,'get_client_records', params);
-    return myAxios.get(url);
-    // return myAxios.get(`/survey_answers/${clientId}`);
   },
 
   //   // },
@@ -46,9 +37,9 @@ export default {
     surveyData['meta']['last_captured'] = new Date();
     
     console.log("savePartialSurvey survey data -------", surveyData);
-    const url = buildURL(myAxios.defaults.baseURL,
+    const url = buildURL(httpLib.defaults.baseURL,
                       'put_partial_ia');//, {_id:surveyData['_id']});
-    return myAxios.put(url, surveyData);
+    return httpLib.put(url, surveyData);
     //return myAxios.put(`/partial/${clientId}`, surveyData);
   },
 
@@ -64,8 +55,8 @@ export default {
     console.log("add  survey data ------------------");
     console.log(surveyData);
 
-    const url = buildURL(myAxios.defaults.baseURL,'post_partial_ia');
-    return myAxios.post(url,surveyData);
+    const url = buildURL(httpLib.defaults.baseURL,'post_partial_ia');
+    return httpLib.post(url,surveyData);
     //return myAxios.put(`/partial/${clientId}`, surveyData);
   }
 

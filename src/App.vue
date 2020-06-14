@@ -1,41 +1,32 @@
 <template>
-  <div>
-  <div id="app" v-hammer:swipe.horizontal="onSwipeHorizontal">
-    
-    <transition name="fade">
-     <SummaryModal v-if="showModal" @close="showModal = false" > 
-  
-      <h3 slot="header">Summary View</h3>
-    </SummaryModal>
-    </transition>
-    <sui-menu pointing>
-      <a
-        is="sui-menu-item"
-        v-for="item in items"
-        :active="isActive(item)"
-        :key="item"
-        :content="item"
-        @click="select(item)"
-      />
-      <sui-menu-menu position="right">
-        <sui-menu-item>
-            <button id="show-modal" @click="showModal = true">Status/Overview</button>
-        </sui-menu-item>
-        <sui-menu-item>
-          <sui-input transparent icon="search" placeholder="Search..." />
-        </sui-menu-item>
-      </sui-menu-menu>
-    </sui-menu>
+    <div class="wrapper">
+      <div class="menu">
+        <button id="show-modal" @click="showModal = true">Status/Overview</button>
+      </div>
+      <!-- <button id="a" @click="getTableData">Cick for Table Data</button>
+      <p id="tableData">
+        </p> -->
+      <div class="content" id="app" v-hammer:swipe.horizontal="onSwipeHorizontal">
+        
+        <transition name="fade">
+        <SummaryModal v-if="showModal" @close="showModal = false" > 
+      
+          <h3 slot="header">Summary View</h3>
+        </SummaryModal>
+        </transition> 
 
-    <sui-segment>
-      <survey :survey="survey"></survey>
-    </sui-segment>
+        
+        <survey :survey="survey"></survey>
+      </div>
 
-  </div>
+
 </div>
 
 </template>
 <script>
+
+console.log( process);
+
 import * as SurveyVue from "survey-vue";
 import { mapActions, mapGetters, mapState } from 'vuex'
 import surveyQuestions from  './questions.json';
@@ -46,6 +37,8 @@ import setupAnimation from './transition.js';
 import setupLookup from './helpers.js';
 import connectHistoryApiFallback from 'connect-history-api-fallback';
 import {generateSummaryHTML, isValidLookupIds} from '@/common/utils.js';
+
+import {runQuery, getUserByID} from './utils/db/TableStoreService';
 
 /**
  * Remote State /DB sync.
@@ -94,6 +87,10 @@ SurveyVue
 //   // able to access vuex store/mutation after Vuex-action call
 // }
 
+// Table storage : https://dmrelease.blob.core.windows.net/azurestoragejssample/samples/sample-table.html#step2
+// https://docs.microsoft.com/en-us/azure/javascript/?view=azure-node-latest
+// https://github.com/Azure/azure-sdk-for-js
+
 export default {
   
   name: "app",
@@ -106,7 +103,7 @@ export default {
   created() {
     
     sessionStorage.clear();
-    this.survey.showNavigationButtons = false;
+    //this.survey.showNavigationButtons = false;
     this.survey.goNextPageAutomatic = true;
     this.survey.onServerValidateQuestions.add(this.lookupClient);
 
@@ -177,7 +174,7 @@ export default {
     //this.survey.data = this.fullSurvey();
   
     setupAnimation(this.survey, this.doAnimation);
-
+   
 
   },
   computed : {
@@ -197,6 +194,13 @@ export default {
       select(name) {
         this.active = name;
       },
+      /*getTableData: function(e) {
+        //const query="$top=5&$select=PartitionKey,RowKey,ClientID,SLK_581,FULL_NAME,Client_type,Commencement_Date,ENROLLING_PROVIDER,PDC,Source_of_referral,Reason_for_cessation,Method_of_use_for_PDC,Main_treatment_type,Usual_accommodation,Living_arrangements";
+        //runQuery();
+        
+        getUserByID('DCCAM130919781', 'SLK_581' , 'MDS')
+        //getUserByID('CCSAU160119691', 'SLK_581' , 'MDS')
+      },*/
       onSwipeHorizontal: function(event) { swipeEvent(this.survey, event) ;},
 
       lookupClient: async function (survey, options) {
@@ -210,7 +214,7 @@ export default {
             if (!lkpdeets){
                 options.errors['DB_ID'] = "Could not setup lookiu";
                 options.complete();
-                return;         
+                return;
             }
   
             try {      
@@ -259,11 +263,11 @@ export default {
  */
 
   data() {
+    console.log(process.env.VUE_APP_SAS_TOKEN_STORE_MDS);
    return {
-      active: 'Home',
-      items: ['Home', 'Messages', 'Friends'],
+      active: 'Home',    
       showModal: false,
-      survey: new SurveyVue.Model(surveyQuestions),
+      survey: new SurveyVue.Model( {surveyId: 'd2a57d75-9073-4333-a85a-cc8f06c21661'}), // surveyQuestions),
       doAnimation:false,
       dirtyData: false,
       isNewSurvey: false
@@ -279,6 +283,42 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
+
+.wrapper {
+    display: grid;
+  justify-content: center;
+   grid-template-columns: repeat(12, 6fr);
+  
+  grid-template-rows: 40px 80px 30px;
+  /* grid-template: repeat(2, 50px) / repeat(3, 1fr); */
+  gap: 0.1rem;
+  
+}
+
+.header {
+  /* grid-column-start: 1;
+  grid-column-end: 3; */
+  grid-column: 2 / -1; 
+  /* use -1 ..we may not know the number of columns */
+}
+
+.menu {
+  grid-row: 1 / 4;
+  grid-column: -1;
+    /* place on the right side */
+}
+
+.content {
+  padding-top: 5rem;
+  grid-column: 2 / -1;
+}
+
+.footer {
+  /* grid-column: 1 / span 2; */
+  grid-column: 2 / -1;
+}
+
+
 
 .fade-enter {
   opacity: 0;

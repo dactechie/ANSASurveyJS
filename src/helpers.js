@@ -28,21 +28,22 @@ function calculateSLK(client_data) {
       default:
           x = 9;
   }
-  return name_part + d + x;
+  return `${name_part}${d}${x}`;
 }
 
 function setupLookup(survey) {
   let lookup_details = {};
-  if (survey.data['DB_ID']) {
-    let client_id = survey.data['DB_ID'];
-    let id_type = survey.data['DB_ID_TYPE'];
+  if (survey.data['ClientID']) {
+    let client_id = survey.data['ClientID'];
+    let id_type = survey.data['IDType'];
     if (!client_id || !id_type) {
+      console.log("reruning undefined from setuplookp")
       return undefined;
     }
-    lookup_details['DB_ID'] =  client_id;
-    lookup_details['DB_ID_TYPE'] =  id_type;
+    lookup_details['ClientID'] =  client_id;
+    lookup_details['IDType'] =  id_type;
   } else {
-      console.log(survey.data);      
+      console.log("survey data " ,survey.data);      
       let result = checkAssign(lookup_details, options.errors,      
                                 { 'Firstname': survey.data.first_name, 
                                   'Surname': survey.data.last_name,
@@ -50,9 +51,11 @@ function setupLookup(survey) {
                                   'DOB': survey.data.DOB 
                                 });
       if (result !== 1)
-        console.log(" ERRORRRRRRRRRRRRRRRRR ");
-      else
-          lookup_details['SLK'] = calculateSLK(lookup_details);
+        console.log(" ERRORRRRRRRRRRRRRRRRR lookupdetails : ", lookup_details);
+      else {
+        lookup_details['ClientID'] = calculateSLK(lookup_details);
+        lookup_details['IDType'] =  'SLK';
+      }
 
       console.log(`Lookup Details ${JSON.stringify(lookup_details)}`);
   }

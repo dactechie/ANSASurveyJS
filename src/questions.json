@@ -48,7 +48,7 @@
         "text": "Communicare"
        }
       ],
-      "colCount": 3
+      "colCount": 6
      },
      {
       "type": "text",
@@ -138,7 +138,7 @@
         "text": "Bega"
        }
       ],
-      "colCount": 3
+      "colCount": 6
      },
      {
       "type": "radiogroup",
@@ -182,7 +182,7 @@
         "visibleIf": "{team_name} = 'bega'"
        }
       ],
-      "colCount": 3
+      "colCount": 8
      }
     ],
     "questionTitleLocation": "hidden",
@@ -223,7 +223,7 @@
         "text": "Sedatives"
        }
       ],
-      "colCount": 3
+      "colCount": 6
      },
      {
       "type": "radiogroup",
@@ -265,7 +265,7 @@
         "visibleIf": "{pdc} = 'nicotine'"
        }
       ],
-      "colCount": 3
+      "colCount": 6
      }
     ],
     "title": "Principal Substance of Concern and Method of Use"
@@ -309,7 +309,8 @@
           "text": "Sedatives",
           "visibleIf": "{pdc} <> 'sedative'"
          }
-        ]
+        ],
+        "colCount": 6
        },
        {
         "type": "radiogroup",
@@ -341,7 +342,7 @@
          }
         ],
         "choicesVisibleIf": "{panel.drug_type} notempty",
-        "colCount": 3
+        "colCount": 6
        },
        {
         "type": "rating",
@@ -429,7 +430,7 @@
           "text": "Smokes"
          }
         ],
-        "colCount": 3
+        "colCount": 6
        },
        {
         "type": "text",
@@ -477,7 +478,7 @@
           "text": "monthly"
          }
         ],
-        "colCount": 4
+        "colCount": 6
        },
        {
         "type": "dropdown",
@@ -574,7 +575,7 @@
           "text": "Packs"
          }
         ],
-        "colCount": 3
+        "colCount": 6
        }
       ],
       "panelCount": 1,

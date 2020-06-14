@@ -10,8 +10,8 @@ export default {
     try {        
         //let id_type = client_lookup['id_type'];
         response = await SurveyService.getLastSurveyData(client_lookup);
-
-        console.log("getLastSurveyData response", response.data);
+        console.log("getLastSurveyData response", response);
+        //console.log("getLastSurveyData response", response.data);
         // inaddition to setting the current client and survey session variables
         // if the client/clients' surveys was/were not in the local storage, it adds them
         // if the client WAS in the local storage, it is possible then smarr-merge the surveys
@@ -22,10 +22,10 @@ export default {
         //  states :
         // 1.  last_captured(frontend) > last-modfiied (backend) (or missing last-mod date) => didn't sync new changes to backend
         // 2. last-modified > last_captured  : admin edited outside the survey -app        
-        commit('updateClientStateFromBackendData', response.data, { root: true }) 
+        // commit('updateClientStateFromBackendData', response.data, { root: true }) 
         
-        //commit('updateClientStateFromBackendData', response.data);
-        commit('updateSurveyStateFromBackendData', response.data);
+        // //commit('updateClientStateFromBackendData', response.data);
+        // commit('updateSurveyStateFromBackendData', response.data);
         
 
       } catch(err){
@@ -42,17 +42,6 @@ export default {
         
     }
 
-    // console.log(`action:GET_LAST_SURVEYS_FOR_CLIENT response forGET_LAST_SURVEYS_FOR_CLIENT `, response);
-    // if (! response || ! response.data ) {
-    //   //commit('updateSurveyData', undefined);// clear the localstorage
-    //   console.log("GET_LAST_SURVEY : ----empty from server")
-    //   console.log("nothing to commit... should i clear the localstorage here ?")
-    //   return undefined;
-    // }
-   
-    //commit('updateSurveyFormData', response.data);
-    
-    // commit('updateSurveyFormData', response.data); // this sets the  state, local and session store from response.data
   },
 
    
