@@ -8,7 +8,12 @@ import { //addOrReplaceOrIgnoreIfMoreRecent,
                 "PrincipalDrugOfConcern": "pdc" , 
                     "MethodOfUse" : "pdc_method_of_use", 
                     "OtherDrugsOfConcern" : "odc", 
-                    "AODHistory":"aod_history"};
+                    "AODHistory":"aod_history",
+                  "Risks":"aod_harms_risks",
+                  "RisksOtherComments": "aod_harms_risks-Comment",
+                  "ImpactOnDailyActivities": "impctdaily",
+                  "AddictiveBehaviours":"additive_behaviours"
+                  };
 // export const STORAGE_KEY = 'survey-vuejs'
 
 // // for testing
