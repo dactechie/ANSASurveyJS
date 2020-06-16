@@ -150,10 +150,13 @@ export function isValidLookupIds (type_client_id) {
   console.log( "here" , type_client_id)
   let client_id = type_client_id[1];
   //TODO : use SLK-pattern from schema/schema.json
-  return (type_client_id[0] === 'SLK') ?
-          /[A-Z0-9]{7}(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])(19|20)[0-9]{2}(1|2|9)/.test(client_id)
+  let result = (type_client_id[0] === 'SLK') ?
+          /[A-Z0-9]{5}(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])(19|20)[0-9]{2}(1|2|9)/.test(client_id)
           :
           Number.isInteger(client_id);
+  console.log("result of isValidLookuipIds ", result);
+  console.log((type_client_id[0] === 'SLK') );
+  return result;
 }
 
 export function buildURL(baseURL, request_type, params){

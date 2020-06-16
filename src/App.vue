@@ -25,7 +25,6 @@
 </template>
 <script>
 
-console.log( process);
 
 import * as SurveyVue from "survey-vue";
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -116,7 +115,8 @@ export default {
     
     this.survey.onValueChanged.add((senderModel, options) => {
       me.dirtyData = true;
-      console.log("page value changed", options)
+      console.log("page value changed", options);
+      console.log("Survey data",this.survey.data);
       // if (Object.keys(me.survey.data).length > 5) { //there is something to store besides the client name, id ( wcih is already known)
       //   me.survey.sendResultOnPageNext = true;
       // }
@@ -210,7 +210,7 @@ export default {
               return;
             }
             
-            let lkpdeets = setupLookup(survey);
+            let lkpdeets = setupLookup(survey, options);
             if (!lkpdeets){
                 options.errors['DB_ID'] = "Could not setup lookiu";
                 options.complete();

@@ -36,7 +36,19 @@ let entGen = TableUtilities.entityGenerator;
 //   taskDone: entGen.Boolean(true),
 // };
    // =YEAR(E2)&"-"&TEXT(MONTH(E2),"00")&"-"&TEXT(DAY(E2),"00")&"T00:00:00.0Z"
-
+async function queryEntities(tableService, ...args) {
+    return new Promise((resolve, reject) => {
+        let promiseHandling = (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        };
+        args.push(promiseHandling);
+        tableService.queryEntities.apply(tableService, args);
+    });
+};
 
 /**
  * 
@@ -44,34 +56,43 @@ let entGen = TableUtilities.entityGenerator;
  * @param {*} idtype    SLK / CCARE / MCARE / TED / Other
  * @param {*} queryType 
  */
-function getByID(id, idType, queryType='Episode') {
+  // params 
+  // IdName : "ClientID"
+  // IdValue : "23232"
+  // IdType : "MCARE"
+// works if the filter=PattitionKEY=ALLFT... part is not encoded 
+//http://127.0.0.1:10002/devstoreaccount1/Episode?filter=PartitionKey=ALLFT210719819&_=1592207886079&st=2020-06-14T09%3A22%3A55Z&se=2024-06-15T09%3A22%3A00Z&sp=rau&sv=2017-04-17&tn=episode&sig=M6BbFodJ%2F0ChyxAhkpObtLZ26DIrFTlmWna5KnWtbes%3D&api-version=2018-03-28
+async function getByID(id, idType, queryType='Episode') {
   const  query = new TableQuery()
+    //.where('PartitionKey == ? ', id);
     .where( `${idType} eq ?`, id)
+  return await queryEntities(tableService, queryType, query, null);
 
-  tableService
-  .queryEntities (queryType, query, null,function(error, result, response) {
-    //console.log(process.env); //console.log(process.env.VUE_APP_STORAGE_HOST_URI_MDS)
-    //.retrieveEntity('entries',  query, null, function(error, result, response) {
-    if (error) {
-      console.error(error.message);
-      return -1;
-    }
-    // result contains the entity
-    if (response.isSuccessful) {
-      console.log(response.body); //let tablestring = makeTableString(response.body); $('#tableData').append (tablestring);
-      return response.body;
-    }
-    console.log(result.entries);
-    return response.entries;
-  });    
+  // tableService
+  // .queryEntities (queryType, query, null,function(error, result, response) {
+  //   //console.log(process.env); //console.log(process.env.VUE_APP_STORAGE_HOST_URI_MDS)
+  //   //.retrieveEntity('entries',  query, null, function(error, result, response) {
+  //   if (error) {
+  //     console.error(error.message);
+  //     return -1;
+  //   }
+  //   // result contains the entity
+  //   if (response.isSuccessful) {
+  //     console.log(response.body); //let tablestring = makeTableString(response.body); $('#tableData').append (tablestring);
+  //     return response.body;
+  //   }
+  //   console.log(result.entries);
+  //   return response.entries;
+  // });    
 
 }
 
-export function getClientAssessments(id, idType) {
+export async function getClientAssessments(id, idType) {
   if (idType !== 'SLK') {
-    return getByID(id, idType,'Episode');
+    return await getByID(id, idType,'Episode');
   }
-  return getByID(slk, 'PartitionKey','Episode');//optimized ?
+  //console.log(getClientAssessments)
+  return await getByID(id, 'PartitionKey','Episode');//optimized ?
 }
 
 /**
@@ -80,25 +101,25 @@ export function getClientAssessments(id, idType) {
  * @param {*} idtype    SLK / CCARE / MCARE / TED / Other
  * @param {*} queryType 
  */
-export function getUserByID(id, idType, queryType='MDS') {
-  const  query = new TableQuery()
-    .where( `${idType} eq ?`, id)
+// export async function getUserByID(id, idType, queryType='MDS') {
+//   const  query = new TableQuery()
+//     .where( `${idType} eq ?`, id)
 
-  tableService.queryEntities (queryType, query, null,function(error, result, response) {
-    //console.log(process.env); //console.log(process.env.VUE_APP_STORAGE_HOST_URI_MDS)
-    //.retrieveEntity('MDS',  query, null, function(error, result, response) {
-    if (error) {
-      console.error(error.message);
-      return -1;
-    }
-    // result contains the entity
-    if (response.isSuccessful) {
-      console.log(response.body); //let tablestring = makeTableString(response.body); $('#tableData').append (tablestring);
-    }
-    console.log(result.entries)
-  });    
+//    tableService.queryEntities (queryType, query, null, function(error, result, response) {
+//     //console.log(process.env); //console.log(process.env.VUE_APP_STORAGE_HOST_URI_MDS)
+//     //.retrieveEntity('MDS',  query, null, function(error, result, response) {
+//     if (error) {
+//       console.error(error.message);
+//       return -1;
+//     }
+//     // result contains the entity
+//     if (response.isSuccessful) {
+//       console.log(response.body); //let tablestring = makeTableString(response.body); $('#tableData').append (tablestring);
+//     }
+//     console.log(result.entries)
+//   });    
 
-}
+// }
 
 /*
 function makeTableString(data) {

@@ -25,7 +25,7 @@ export default {
         // commit('updateClientStateFromBackendData', response.data, { root: true }) 
         
         // //commit('updateClientStateFromBackendData', response.data);
-        // commit('updateSurveyStateFromBackendData', response.data);
+        commit('updateSurveyStateFromBackendData', response.entries);
         
 
       } catch(err){

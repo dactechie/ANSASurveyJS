@@ -2,6 +2,13 @@ import { //addOrReplaceOrIgnoreIfMoreRecent,
    clientHasSurveys, createNewLocalSurvey, getMatchingContinuableLocalSurveyIndex, isLocalNewerVersion,
    getContinuableLocalSurveyIndex   } from '@/common/utils';
 
+   const mapper = { 
+                "Team" :"team_name",
+                "Staff": "staff_name",
+                "PrincipalDrugOfConcern": "pdc" , 
+                    "MethodOfUse" : "pdc_method_of_use", 
+                    "OtherDrugsOfConcern" : "odc", 
+                    "AODHistory":"aod_history"};
 // export const STORAGE_KEY = 'survey-vuejs'
 
 // // for testing
@@ -71,6 +78,23 @@ export const mutations = {
 
   },
 
+  updateSurveyStateFromBackendData(state, serverResponseData) {
+    let backendEpisode = serverResponseData[0];
+    let localSurvey = sessionStorage.getItem('CurrentSurvey') || {}
+    let value = "";
+    for (let key in backendEpisode) {
+      value = backendEpisode[key]._;
+      if (! value) continue;
+      if (value[0] === "[")
+        value = JSON.parse(value);
+      localSurvey[mapper[key]] = value;
+    }
+
+    sessionStorage.setItem('CurrentSurvey', JSON.stringify(localSurvey));
+    
+    
+  },
+
 /**
  *       // inaddition to setting the current client and survey session variables
         // if the client/clients' surveys was/were not in the local storage, it adds them
@@ -85,7 +109,7 @@ export const mutations = {
  * @param {*} state 
  * @param {*} backendSurveyData  : [db_id, response.data)]
  */
-  updateSurveyStateFromBackendData(state, serverResponseData) {
+  updateSurveyStateFromBackendData1(state, serverResponseData) {
     const backendClientData = serverResponseData.client;
     let backendSurveyData= serverResponseData.survey ;
 

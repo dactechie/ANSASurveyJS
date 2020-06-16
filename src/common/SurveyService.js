@@ -12,8 +12,8 @@ export default {
   //     `${myAxios.defaults.baseURL}?request_type=get_partial_ia&client_id=${client_id}&id_type=${id_type}`);
   //   // return myAxios.get(`/survey_answers/${clientId}`);
   // },
-  getLastSurveyData(client_lookup)  {
-      return getClientAssessments(client_lookup['ClientID'], client_lookup['IDType'])
+  async getLastSurveyData(client_lookup)  {
+      return await getClientAssessments(client_lookup['ClientID'], client_lookup['IDType'])
 
   },
 

@@ -31,11 +31,11 @@ function calculateSLK(client_data) {
   return `${name_part}${d}${x}`;
 }
 
-function setupLookup(survey) {
+function setupLookup(survey, options) {
   let lookup_details = {};
-  if (survey.data['ClientID']) {
-    let client_id = survey.data['ClientID'];
-    let id_type = survey.data['IDType'];
+  if (survey.data['DB_ID']) {
+    let client_id = survey.data['DB_ID'];
+    let id_type = survey.data['DB_ID_TYPE'];
     if (!client_id || !id_type) {
       console.log("reruning undefined from setuplookp")
       return undefined;
