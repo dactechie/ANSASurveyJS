@@ -34,10 +34,10 @@ import drugs from './schema/drugs.json';  // TODO incorporate this into the drop
 import swipeEvent from './swipe.js';
 import setupAnimation from './transition.js';
 import setupLookup from './helpers.js';
-import connectHistoryApiFallback from 'connect-history-api-fallback';
+//import connectHistoryApiFallback from 'connect-history-api-fallback';
 import {generateSummaryHTML, isValidLookupIds} from '@/common/utils.js';
 
-import {runQuery, getUserByID} from './utils/db/TableStoreService';
+import {runQuery, getUserByID, addUpdate} from './utils/db/TableStoreService';
 
 /**
  * Remote State /DB sync.
@@ -107,7 +107,14 @@ export default {
     this.survey.onServerValidateQuestions.add(this.lookupClient);
 
     this.survey.onComplete.add(function(survey, options) {
+      if (me.isNewSurvey) {
+        console.log("new survey")
+      } else {
+        console.log(" NOT A new survey")
+      }
         console.log(JSON.stringify(survey.data));
+
+        addUpdate(survey.data);
     });
 
 
@@ -153,7 +160,7 @@ export default {
                 delete model.data['_id'];
                 me.ADD_SURVEY_DATASERVER(model.data);
                 me.isNewSurvey = false;
-                //me.UPDATE_SURVEY_DATASERVER(model.data);
+                me.UPDATE_SURVEY_DATASERVER(model.data);
             }
             me.dirtyData = false;
         }
@@ -205,10 +212,10 @@ export default {
 
       lookupClient: async function (survey, options) {
             //options.data contains the data for the current page.
-            if (survey.currentPageNo != 1 ) {
-              options.complete();
-              return;
-            }
+            // if (survey.currentPageNo != 1 ) {
+            //   options.complete();
+            //   return;
+            // }
             
             let lkpdeets = setupLookup(survey, options);
             if (!lkpdeets){
@@ -250,24 +257,19 @@ export default {
       },
 
 },
-/***
- * *  LOADING DATA INTO SURVEY ---------------------------
- * *  LOADING DATA INTO SURVEY ---------------------------
- * *  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------
- *  LOADING DATA INTO SURVEY ---------------------------
- * 
- * *    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<
- *    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<   * https://surveyjs.io/Examples/Library/?id=survey-data&platform=jQuery&theme=modern
- *    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<*    <<<<<<<<<<<<<<<<<<<<
- *        *  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------*  LOADING DATA INTO SURVEY ---------------------------
- */
+
 
   data() {
+    let v2 = "ddc3dec4-6de5-4bc9-a963-87e20896feed",
+        sandbox = 'd2a57d75-9073-4333-a85a-cc8f06c21661',
+        v1 = "4058ca73-73a0-43a0-a5fc-c2c10b7cf575";
+
+
     console.log(process.env.VUE_APP_SAS_TOKEN_STORE_MDS);
    return {
       active: 'Home',    
       showModal: false,
-      survey: new SurveyVue.Model( {surveyId: 'd2a57d75-9073-4333-a85a-cc8f06c21661'}), // surveyQuestions),
+      survey: new SurveyVue.Model( {surveyId: v2}), // surveyQuestions),
       doAnimation:false,
       dirtyData: false,
       isNewSurvey: false
@@ -282,6 +284,10 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+}
+.sv-selectbase__column {
+      min-width: 50%;
+    vertical-align: top;
 }
 
 .wrapper {

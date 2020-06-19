@@ -4,7 +4,26 @@
 //  -> addOrReplaceOrIgnoreIfMoreRecent (state['survey'], client['SLK'], survey)
 let ONE_HOUR = 60 * 60 * 1000;
 
+export function objectFlip(obj) {
+  const ret = {};
+  Object.keys(obj).forEach(key => {
+    ret[obj[key]] = key;
+  });
+  return ret;
+}
 
+export async function promisify(object, fn, ...args) {
+  return new Promise((resolve, reject) => {
+      let promiseHandling = (err, result) => {
+          if (err) 
+            reject(err);
+          else 
+            resolve(result);            
+      };
+      args.push(promiseHandling);
+      fn.apply(object, args);
+  });
+};
 
 function tryGetClientFromLocalStore (client_lookup) {
   let localData = JSON.parse(localStorage.getItem("mj-surveyjs"));

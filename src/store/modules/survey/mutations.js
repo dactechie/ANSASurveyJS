@@ -2,18 +2,19 @@ import { //addOrReplaceOrIgnoreIfMoreRecent,
    clientHasSurveys, createNewLocalSurvey, getMatchingContinuableLocalSurveyIndex, isLocalNewerVersion,
    getContinuableLocalSurveyIndex   } from '@/common/utils';
 
-   const mapper = { 
-                "Team" :"team_name",
-                "Staff": "staff_name",
-                "PrincipalDrugOfConcern": "pdc" , 
-                    "MethodOfUse" : "pdc_method_of_use", 
-                    "OtherDrugsOfConcern" : "odc", 
-                    "AODHistory":"aod_history",
-                  "Risks":"aod_harms_risks",
-                  "RisksOtherComments": "aod_harms_risks-Comment",
-                  "ImpactOnDailyActivities": "impctdaily",
-                  "AddictiveBehaviours":"additive_behaviours"
-                  };
+import {DBSurveyFieldNameMapper as mapper}    from '@/utils/db/mappers';
+  //  const mapper = { 
+  //               "Team" :"team_name",
+  //               "Staff": "staff_name",
+  //               "PrincipalDrugOfConcern": "pdc" , 
+  //                   "MethodOfUse" : "pdc_method_of_use", 
+  //                   "OtherDrugsOfConcern" : "odc", 
+  //                   "AODHistory":"aod_history",
+  //                 "Risks":"aod_harms_risks",
+  //                 "RisksOtherComments": "aod_harms_risks-Comment",
+  //                 "ImpactOnDailyActivities": "impctdaily",
+  //                 "AddictiveBehaviours":"additive_behaviours"
+  //                 };
 // export const STORAGE_KEY = 'survey-vuejs'
 
 // // for testing
@@ -103,8 +104,8 @@ export const mutations = {
 /**
  *       // inaddition to setting the current client and survey session variables
         // if the client/clients' surveys was/were not in the local storage, it adds them
-        // if the client WAS in the local storage, it is possible then smarr-merge the surveys
-        // smart-merge : there moght have been a prior session where the partial updates to the survey had no chance to reach the server/
+        // if the client WAS in the local storage, it is possible then smart-merge the surveys
+        // smart-merge : there might have been a prior session where the partial updates to the survey had no chance to reach the server/
         // if the 'capture-date' on the localstore-survey is newer than any of the surveys' 'last-modified-date' returned from the backend, then ask the client
         // do they want to continue editing the draft or discard and start over.
 

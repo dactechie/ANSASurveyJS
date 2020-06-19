@@ -1,7 +1,8 @@
 
 import httpLib from './api';
 import {getMeta, buildURL} from './utils';
-import {getClientAssessments} from '@/utils/db/TableStoreService.js';
+//import { addUpdate } from '../utils/db/TableStoreService';
+import {getByID, addUpdate} from '@/utils/db/TableStoreService';
 
 
 export default {
@@ -13,8 +14,22 @@ export default {
   //   // return myAxios.get(`/survey_answers/${clientId}`);
   // },
   async getLastSurveyData(client_lookup)  {
-      return await getClientAssessments(client_lookup['ClientID'], client_lookup['IDType'])
+    let episodeData ={}
+    if (client_lookup['IDType'] !== 'SLK') {
+      episodeData = await getByID(client_lookup['ClientID'], client_lookup['IDType'],'Episode');
+    }
+    //console.log(getClientAssessments)
+    episodeData = await getByID(client_lookup['ClientID'], 'PartitionKey','Episode');//optimized ?
+    if (! episodeData) {
+      //look for client details in MDS table.
+      // if can't find client there too, FAIL 
+      console.log("No episode data for client ", client_lookup);
+    }
+    // let timestamp =  episodeData[undefined]
+    delete episodeData['undefined'];
+    // console.log("old timestamp ", timestamp);
 
+    return episodeData;
   },
 
   //   // },
@@ -26,9 +41,11 @@ export default {
   //   // return myAxios.get(`/survey_answers/${clientId}`);
   // },
 
-
-
   savePartialSurvey (surveyData)  {
+    addUpdate(surveyData, 'Episode')
+  },
+
+  savePartialSurvey2 (surveyData)  {
     console.log('save partial', surveyData);
     if (!( 'client_id'  in surveyData)){
       console.info("SurveyService: client id not in data");
